@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -277,6 +278,7 @@
         document.getElementById('customModal').style.display = 'none';
     }
 
+    // --- BILLING HANDLERS ---
     function handleBillingClick(idCst) {
         const card = document.getElementById(`card-${idCst}`);
         const nama = card.querySelector('h3').innerText;
@@ -330,31 +332,6 @@
         }
     }
 
-    function formatNomorCantik(hp) {
-        if (!hp) return "-";
-        let clean = hp.replace(/\D/g, "");
-        if (clean.startsWith("62")) { clean = "0" + clean.slice(2); } 
-        else if (!clean.startsWith("0")) { clean = "0" + clean; }
-        let p1 = clean.substring(0, 4);
-        let p2 = clean.substring(4, 8);
-        let p3 = clean.substring(8, 13);
-        let result = p1;
-        if (p2) result += "-" + p2;
-        if (p3) result += "-" + p3;
-        return result;
-    }
-
-    function copyText(text) {
-        navigator.clipboard.writeText(text).then(() => {}).catch(err => {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-        });
-    }
-
     function resetBillingFilter() {
         openModal({
             title: '🔄 RESET FILTER LIST',
@@ -388,6 +365,32 @@
         }
     }
 
+    // --- UI HELPERS ---
+    function formatNomorCantik(hp) {
+        if (!hp) return "-";
+        let clean = hp.replace(/\D/g, "");
+        if (clean.startsWith("62")) { clean = "0" + clean.slice(2); } 
+        else if (!clean.startsWith("0")) { clean = "0" + clean; }
+        let p1 = clean.substring(0, 4);
+        let p2 = clean.substring(4, 8);
+        let p3 = clean.substring(8, 13);
+        let result = p1;
+        if (p2) result += "-" + p2;
+        if (p3) result += "-" + p3;
+        return result;
+    }
+
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {}).catch(err => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        });
+    }
+
     function updateBulanDisplay() {
         const bulanNames = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
         const d = new Date();
@@ -408,6 +411,7 @@
         return "wa.me/+62" + clean;
     }
 
+    // --- SECURITY / PIN ---
     let currentPin = "";
     function pressPin(num) { if (currentPin.length < 4) { currentPin += num; document.getElementById('pinInput').value = currentPin; } }
     function clearPin() { currentPin = ""; document.getElementById('pinInput').value = ""; }
@@ -439,6 +443,7 @@
         finally { btn.innerHTML = "OK"; }
     }
 
+    // --- MAIN LOGIC & INITIALIZATION ---
     window.addEventListener('DOMContentLoaded', () => {
         updateBulanDisplay();
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -496,6 +501,7 @@
         if(tab === 'tabel') { updateBulanDisplay(); muatDataTabel(); }
     }
 
+    // --- CORE DATA FETCHING ---
     async function cariData(mode, btnEl) {
         if(btnEl) triggerAnimate(btnEl); 
         const query = document.getElementById('userInput').value.trim();
@@ -509,11 +515,7 @@
                     headerClass: 'bg-orange-500',
                     body: `<p>NAMA, ID CST, ATAU TANGGAL BELUM DIISI</p>`,
                     subtext: 'SILAKAN MASUKKAN KATA KUNCI PENCARIAN',
-                    buttons: [{ 
-                        text: 'MENGERTI', 
-                        class: 'bg-orange-500 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', 
-                        action: () => {} 
-                    }]
+                    buttons: [{ text: 'MENGERTI', class: 'bg-orange-500 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', action: () => {} }]
                 });
                 return; 
             }
@@ -586,7 +588,6 @@
     }
 
     function renderCard(item, mode) {
-        // PERUBAHAN: Hanya sembunyikan jika berada di mode 'fast'
         if (mode === 'fast' && hiddenBillingIds.includes(item.idCst)) { return ""; }
         
         const tglParts = item.tanggal.split('/');
@@ -626,6 +627,7 @@
             </div>`;
     }
 
+    // --- INTEGRATED WA PROCESS ---
     async function prosesWa(hp, id, nama, japo, paket) {
         try { 
             const cardEl = document.getElementById(`card-${id}`);
@@ -633,9 +635,9 @@
             const alamat = cardEl ? cardEl.querySelector('p:nth-child(5) b').innerText : '-';
             const tgl = cardEl ? cardEl.querySelector('p:nth-child(2) b').innerText : '-';
             
-            const tglParts = tgl.split('/');
+            // Hitung selisih hari secara siklis
+            const tglParts = tgl.split('/'); 
             const hariPasang = parseInt(tglParts[0]); 
-            
             const today = new Date();
             const hariSekarang = today.getDate(); 
             
@@ -653,29 +655,35 @@
             else if (hours >= 15 && hours < 18) salam = "Sore";
 
             let text = "";
-            if (diffDays > 10) {
-                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic apakah selama ini ada kendala. Mohon diinfokan apabila ada trouble kendalanya agar segera diperbaiki oleh Tim kami. Terima kasih.`;
-            } else if (diffDays <= 2) {
-                text = `Selamat ${salam} Pelanggan yth. *${nama.trim()}*,%0A%0A *PENGINGAT TAGIHAN MyRepublic*%0A%0A Semoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A 🆔 ID Pelanggan: *${id}*%0A 🚀 Paket: *${paket}*%0A 🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A _Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A *Penting:*%0A • Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0A Terima kasih.`;
+            if (diffDays <= 2) {
+                text = `Selamat ${salam} Pelanggan yth. *${nama.trim()}*,%0A%0A*PENGINGAT TAGIHAN MyRepublic*%0A%0ASemoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A🆔 ID Pelanggan: *${id}*%0A🚀 Paket: *${paket}*%0A🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A_Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A*Penting:*%0A• Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0ATerima kasih.`;
             } else if (diffDays >= 3 && diffDays <= 5) {
-                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Mengingatkan tagihan dengan ID Pelanggan *${id}* sudah dapat dilakukan pembayaran. Terima kasih.`;
+                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Mengingatkan tagihan dengan ID Pelanggan *${id}* sudah dapat dilakukan pembayaran agar layanan tetap aktif. Terima kasih.`;
+            } else if (diffDays >= 6 && diffDays <= 10) {
+                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saat ini tagihan ID Pelanggan *${id}* sudah melewati jatuh tempo.%0A%0ASegera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis oleh sistem. Terima kasih.`;
             } else {
-                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saat ini sudah melewati jatuh tempo dengan ID Pelanggan *${id}*.%0A%0A Segera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis. Terima kasih.`;
+                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic apakah selama ini ada kendala. Mohon diinfokan apabila ada trouble agar segera dibantu oleh Tim kami. Terima kasih.`;
             }
 
             await downloadImage(nama, id, paket, alamat, tgl, japo, hp, email);
+
             let cleanHp = hp.replace(/\D/g, "");
             if (cleanHp.startsWith("0")) cleanHp = "62" + cleanHp.slice(1);
+            
             const waAppUrl = `whatsapp://send?phone=${cleanHp}&text=${text}`;
             const waWebUrl = `https://api.whatsapp.com/send?phone=${cleanHp}&text=${text}`;
+            
             window.location.href = waAppUrl;
             setTimeout(() => { if (document.hasFocus()) { window.open(waWebUrl, '_blank'); } }, 500);
+
             await new Promise(resolve => setTimeout(resolve, 5000));
             fetch(`${scriptURL}?action=hapusProgress&idCst=${id}`); 
             updateProgressCounter();
-        } catch(e) { console.error("Error:", e); }
+
+        } catch(e) { console.error("Error pada proses WA:", e); }
     }
 
+    // --- OTHER API CALLS ---
     async function muatDataTabel(btnEl) {
         if(btnEl) triggerAnimate(btnEl); 
         const btn = document.getElementById('btnRefreshTabel');
