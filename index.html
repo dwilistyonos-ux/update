@@ -502,7 +502,6 @@
         const tglFilter = document.getElementById('dateInput').value;
         const list = document.getElementById('resultsList');
         
-        // --- LOGIKA POPUP SERAGAM UNTUK INPUT KOSONG ---
         if (mode === 'search') {
             if (!query && !tglFilter) { 
                 openModal({
@@ -587,7 +586,9 @@
     }
 
     function renderCard(item, mode) {
-        if (hiddenBillingIds.includes(item.idCst)) { return ""; }
+        // PERUBAHAN: Hanya sembunyikan jika berada di mode 'fast'
+        if (mode === 'fast' && hiddenBillingIds.includes(item.idCst)) { return ""; }
+        
         const tglParts = item.tanggal.split('/');
         const pasangDate = new Date(tglParts[2], tglParts[1] - 1, tglParts[0]);
         const today = new Date();
@@ -631,10 +632,20 @@
             const email = cardEl ? cardEl.getAttribute('data-email') || '-' : '-';
             const alamat = cardEl ? cardEl.querySelector('p:nth-child(5) b').innerText : '-';
             const tgl = cardEl ? cardEl.querySelector('p:nth-child(2) b').innerText : '-';
+            
             const tglParts = tgl.split('/');
-            const pasangDate = new Date(tglParts[2], tglParts[1] - 1, tglParts[0]);
+            const hariPasang = parseInt(tglParts[0]); 
+            
             const today = new Date();
-            const diffDays = Math.ceil(Math.abs(today - pasangDate) / (1000 * 60 * 60 * 24));
+            const hariSekarang = today.getDate(); 
+            
+            let diffDays;
+            if (hariSekarang >= hariPasang) {
+                diffDays = hariSekarang - hariPasang;
+            } else {
+                diffDays = (hariSekarang + 30) - hariPasang;
+            }
+
             const hours = today.getHours();
             let salam = "Malam";
             if (hours >= 5 && hours < 11) salam = "Pagi";
@@ -645,11 +656,11 @@
             if (diffDays > 10) {
                 text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic apakah selama ini ada kendala. Mohon diinfokan apabila ada trouble kendalanya agar segera diperbaiki oleh Tim kami. Terima kasih.`;
             } else if (diffDays <= 2) {
-                text = `Selamat ${salam}. *PENGINGAT TAGIHAN MyRepublic*%0A%0A Pelanggan yth. *${nama.trim()}*,%0A Semoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A 🆔 ID Pelanggan: *${id}*%0A 🚀 Paket: *${paket}*%0A 🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A _Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A *Penting:*%0A • Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0A Terima kasih.`;
+                text = `Selamat ${salam} Pelanggan yth. *${nama.trim()}*,%0A%0A *PENGINGAT TAGIHAN MyRepublic*%0A%0A Semoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A 🆔 ID Pelanggan: *${id}*%0A 🚀 Paket: *${paket}*%0A 🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A _Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A *Penting:*%0A • Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0A Terima kasih.`;
             } else if (diffDays >= 3 && diffDays <= 5) {
-                text = `Selamat ${salam} Bpk/Ibu. Mengingatkan tagihan a/n *${nama.trim()}* dengan ID Pelanggan *${id}* sudah dapat dilakukan pembayaran. Terima kasih.`;
+                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Mengingatkan tagihan dengan ID Pelanggan *${id}* sudah dapat dilakukan pembayaran. Terima kasih.`;
             } else {
-                text = `Selamat ${salam}. Bpk/Ibu *${nama.trim()}* saat ini sudah melewati jatuh tempo dengan ID Pelanggan *${id}*.%0A%0A Segera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis. Terima kasih.`;
+                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saat ini sudah melewati jatuh tempo dengan ID Pelanggan *${id}*.%0A%0A Segera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis. Terima kasih.`;
             }
 
             await downloadImage(nama, id, paket, alamat, tgl, japo, hp, email);
