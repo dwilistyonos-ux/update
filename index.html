@@ -266,6 +266,32 @@
         return result;
     }
 
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "COPIED!";
+            btn.classList.replace('bg-indigo-600', 'bg-green-600');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-green-600', 'bg-indigo-600');
+            }, 1500);
+        }).catch(err => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert("ID Berhasil disalin: " + text);
+            } catch (err) {
+                console.error('Gagal menyalin text', err);
+            }
+            document.body.removeChild(textArea);
+        });
+    }
+
     function resetBillingFilter() {
         if (confirm("Apakah Anda ingin memunculkan kembali semua data yang pernah disembunyikan?")) {
             hiddenBillingIds = [];
@@ -362,7 +388,7 @@
         }
 
         const selectBonus = document.getElementById('selectBonus');
-        selectBonus.innerHTML = ""; // Bersihkan dulu
+        selectBonus.innerHTML = ""; 
         selectBonus.add(new Option("-- Pilih Bonus --", ""));
         for (let b = 25000; b <= 1000000; b += 25000) {
             let label = "Rp" + b.toLocaleString('id-ID');
@@ -474,24 +500,30 @@
         const pasangDate = new Date(tglParts[2], tglParts[1] - 1, tglParts[0]);
         const today = new Date();
         const diffDays = Math.ceil(Math.abs(today - pasangDate) / (1000 * 60 * 60 * 24));
+        
         let cardColorClass = (diffDays <= 10) ? "card-red border-red-200" : (diffDays <= 60 ? "card-orange border-orange-200" : "card-blue border-blue-200");
-        let statusLabel = (diffDays <= 10) ? `<span class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-black">${diffDays} HARI</span>` : (diffDays <= 60 ? '<span class="bg-orange-500 text-white px-2 py-0.5 rounded text-[10px] font-black">BARU</span>' : '<span class="bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-black">LAMA</span>');
+        
+        let statusLabel = (diffDays <= 10) ? `<span class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">${diffDays} HARI</span>` : (diffDays <= 60 ? '<span class="bg-orange-500 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">BARU</span>' : '<span class="bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">LAMA</span>');
+        
         const isProg = item.command.toLowerCase().includes('progress');
         const commandHtml = item.command && item.command.trim() !== "" ? `<p class="col-span-2 border-t pt-1 mt-1 text-indigo-700 font-semibold">📝 Command: <i>${item.command}</i></p>` : "";
-        const billingBtn = (mode === 'fast') ? `<button onclick="handleBillingClick('${item.idCst}')" class="text-[9px] bg-red-600 text-white px-2 py-1 rounded font-black uppercase shadow-sm ml-1">Billing</button>` : "";
+        
+        const billingBtn = (mode === 'fast') ? `<button onclick="handleBillingClick('${item.idCst}')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Billing</button>` : "";
 
         return `
             <div id="card-${item.idCst}" data-email="${item.email || '-'}" class="glass-card p-5 shadow-xl border-l-[12px] mb-4 ${cardColorClass} ${isProg ? 'border-orange-500' : ''}">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-black text-indigo-900 uppercase text-lg leading-tight blink-name">${item.nama} ${statusLabel}</h3>
+                <div class="mb-3">
+                    <h3 class="font-black text-indigo-900 uppercase text-lg leading-tight blink-name">${item.nama}</h3>
+                    <div class="flex gap-2 mt-2">
+                        ${billingBtn}
+                        <button onclick="copyText('${item.idCst}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Salin ID</button>
+                    </div>
                 </div>
+
                 <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-slate-600 bg-white/50 p-3 rounded-xl mb-3 border border-slate-200">
-                    <p class="col-span-2 flex items-center justify-between bg-white p-1.5 rounded border border-indigo-100 mb-1">
+                    <p class="col-span-2 flex items-center bg-white p-1.5 rounded border border-indigo-100 mb-1">
                         <span>🆔 ID: <b class="text-indigo-900">${item.idCst}</b></span>
-                        <span class="flex">
-                            <button onclick="copyText('${item.idCst}')" class="text-[9px] bg-indigo-600 text-white px-2 py-1 rounded font-black uppercase shadow-sm">Salin</button>
-                            ${billingBtn}
-                        </span>
+                        ${statusLabel} 
                     </p>
                     <p>🗓️ Pasang: <b>${item.tanggal}</b></p>
                     <p>🔔 JAPO: <b class="text-red-500">Tgl ${item.japo}</b></p>
@@ -499,8 +531,9 @@
                     <p class="col-span-2">📍 Alamat: <b>${item.alamat}</b></p>
                     ${commandHtml}
                 </div>
+                
                 <div class="flex gap-2">
-                    <button onclick="prosesWa('${item.hp}', '${item.idCst}', '${item.nama}', '${item.japo}', '${item.paket}')" class="flex-1 bg-green-500 text-white font-black py-3 rounded-xl text-xs hover:bg-green-600 shadow-lg transition-all active:scale-95">WA</button>
+                    <button onclick="prosesWa('${item.hp}', '${item.idCst}', '${item.nama}', '${item.japo}', '${item.paket}')" class="flex-1 bg-green-500 text-white font-black py-3 rounded-xl text-xs hover:bg-green-600 shadow-lg transition-all active:scale-95">KIRIM NOTIFIKASI WA</button>
                 </div>
             </div>`;
     }
@@ -619,4 +652,3 @@
 </script>
 </body>
 </html>
-
