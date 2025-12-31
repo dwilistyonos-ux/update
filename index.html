@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -544,31 +543,65 @@
             const email = cardEl ? cardEl.getAttribute('data-email') || '-' : '-';
             const alamat = cardEl ? cardEl.querySelector('p:nth-child(5) b').innerText : '-';
             const tgl = cardEl ? cardEl.querySelector('p:nth-child(2) b').innerText : '-';
+            
+            // --- LOGIKA PENENTU PESAN OTOMATIS ---
+            const tglParts = tgl.split('/');
+            const pasangDate = new Date(tglParts[2], tglParts[1] - 1, tglParts[0]);
+            const today = new Date();
+            
+            // Menghitung selisih hari
+            const diffTime = Math.abs(today - pasangDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Penentu Salam
+            const hours = today.getHours();
+            let salam = "Malam";
+            if (hours >= 5 && hours < 11) salam = "Pagi";
+            else if (hours >= 11 && hours < 15) salam = "Siang";
+            else if (hours >= 15 && hours < 18) salam = "Sore";
+
+            let text = "";
+
+            if (diffDays > 10) {
+                // PESAN FOLLOW-UP KUALITAS (> 10 HARI)
+                text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic apakah selama ini ada kendala. Mohon diinfokan apabila ada trouble kendalanya agar segera diperbaiki oleh Tim kami. Terima kasih.`;
+            } else if (diffDays <= 2) {
+                // PENGINGAT TAGIHAN 1
+                text = `Selamat ${salam}. *PENGINGAT TAGIHAN MyRepublic*%0A%0A` +
+                       `Pelanggan yth. *${nama.trim()}*,%0A` +
+                       `Semoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A` +
+                       `🆔 ID Pelanggan: *${id}*%0A` +
+                       `🚀 Paket: *${paket}*%0A` +
+                       `🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A` +
+                       `_Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A` +
+                       `*Penting:*%0A` +
+                       `• Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0A` +
+                       `Terima kasih.`;
+            } else if (diffDays >= 3 && diffDays <= 5) {
+                text = `Selamat ${salam} Bpk/Ibu. Mengingatkan tagihan a/n *${nama.trim()}* dengan ID Pelanggan *${id}* sudah dapat dilakukan pembayaran. Terima kasih.`;
+            } else {
+                text = `Selamat ${salam}. Bpk/Ibu *${nama.trim()}* saat ini sudah melewati jatuh tempo dengan ID Pelanggan *${id}*.%0A%0A` +
+                       `Segera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis. Terima kasih.`;
+            }
+
+            // Jalankan download kartu
             await downloadImage(nama, id, paket, alamat, tgl, japo, hp, email);
+            
+            // Proses HP
+            let cleanHp = hp.replace(/\D/g, "");
+            if (cleanHp.startsWith("0")) cleanHp = "62" + cleanHp.slice(1);
+            
+            const waAppUrl = `whatsapp://send?phone=${cleanHp}&text=${text}`;
+            const waWebUrl = `https://api.whatsapp.com/send?phone=${cleanHp}&text=${text}`;
+
+            window.location.href = waAppUrl;
+            setTimeout(() => { if (document.hasFocus()) { window.open(waWebUrl, '_blank'); } }, 500);
+
             await new Promise(resolve => setTimeout(resolve, 5000));
             fetch(`${scriptURL}?action=hapusProgress&idCst=${id}`); 
-        } catch(e) { console.error("Error download/progress:", e); }
+            updateProgressCounter();
 
-        let cleanHp = hp.replace(/\D/g, "");
-        if (cleanHp.startsWith("0")) cleanHp = "62" + cleanHp.slice(1);
-
-        const text = `*PENGINGAT TAGIHAN MyRepublic*%0A%0A` +
-                     `Halo Pelanggan yth. *${nama.trim()}*,%0A` +
-                     `Semoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A` +
-                     `🆔 ID Pelanggan: *${id}*%0A` +
-                     `🚀 Paket: *${paket}*%0A` +
-                     `🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A` +
-                     `_Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A` +
-                     `*Penting:*%0A` +
-                     `• Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0A` +
-                     `Terima kasih.`;
-
-        const waAppUrl = `whatsapp://send?phone=${cleanHp}&text=${text}`;
-        const waWebUrl = `https://api.whatsapp.com/send?phone=${cleanHp}&text=${text}`;
-
-        window.location.href = waAppUrl;
-        setTimeout(() => { if (document.hasFocus()) { window.open(waWebUrl, '_blank'); } }, 500);
-        setTimeout(() => { updateProgressCounter(); }, 2000);
+        } catch(e) { console.error("Error dalam proses kirim pesan:", e); }
     }
 
     async function muatDataTabel(btnEl) {
