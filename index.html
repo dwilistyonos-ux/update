@@ -18,28 +18,37 @@
         th { background: #f8fafc; color: #1e1b4b; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; padding: 12px; border: 1px solid #e2e8f0; }
         td { padding: 15px; text-align: center; border: 1px solid #e2e8f0; font-weight: 800; color: #4338ca; font-size: 14px; }
         
+        #customModal { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { width: 100%; max-width: 350px; background: white; border-radius: 30px; overflow: hidden; animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
         @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
         .blink-name { animation: pulse-soft 2s infinite ease-in-out; }
-
-        @keyframes click-bounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.92); }
-            100% { transform: scale(1); }
-        }
         .animate-click { animation: click-bounce 0.2s ease-out; }
+        @keyframes click-bounce { 0% { transform: scale(1); } 50% { transform: scale(0.92); } 100% { transform: scale(1); } }
 
         .card-red { border: 1px solid #fee2e2; background: #fff1f1; }
         .card-orange { border: 1px solid #ffedd5; background: #fff7ed; }
         .card-blue { border: 1px solid #e0e7ff; background: #f5f7ff; }
-
         .group-header { background: rgba(255, 255, 255, 0.2); padding: 8px 15px; border-radius: 10px; color: white; font-weight: 900; font-size: 12px; margin: 15px 0 10px 0; border: 1px dashed rgba(255,255,255,0.3); text-align: center; text-transform: uppercase; }
-        
         .stats-group { background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 20px; padding: 15px; margin-bottom: 24px; }
-
         #undoToast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center">
+
+    <div id="customModal">
+        <div class="modal-box shadow-2xl">
+            <div id="modalHeader" class="p-4 text-center">
+                <h3 id="modalTitle" class="text-white font-black tracking-widest uppercase text-sm"></h3>
+            </div>
+            <div class="p-6 text-center">
+                <div id="modalBody" class="text-slate-700 font-bold space-y-1 mb-6 text-sm uppercase"></div>
+                <p id="modalSubtext" class="text-[10px] text-slate-400 font-black mb-4 uppercase"></p>
+                <div class="grid grid-cols-2 gap-3" id="modalButtons"></div>
+            </div>
+        </div>
+    </div>
 
     <div id="undoToast" class="bg-slate-800 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4">
         <span class="text-sm font-bold">Data disembunyikan</span>
@@ -80,16 +89,12 @@
     <div id="sectionTabel" class="max-w-5xl w-full">
         <div class="glass-card p-6 overflow-hidden">
             <h2 class="text-2xl font-black text-indigo-900 uppercase mb-4 text-center">Rekapitulasi</h2>
-            
             <div class="bg-green-600 rounded-3xl p-6 text-center mb-6 shadow-lg shadow-green-200">
                 <p class="text-green-100 font-bold uppercase text-xs mb-1">Bonus</p>
                 <h3 id="t-bonus" class="text-4xl font-black text-white">Rp0</h3>
             </div>
-
             <div class="stats-group">
-                <div id="displayBulan" class="col-span-3 text-center font-black text-indigo-600 text-[11px] mb-3 uppercase tracking-[0.2em] border-b-2 border-slate-200 pb-2">
-                    BULAN ...
-                </div>
+                <div id="displayBulan" class="col-span-3 text-center font-black text-indigo-600 text-[11px] mb-3 uppercase tracking-[0.2em] border-b-2 border-slate-200 pb-2">BULAN ...</div>
                 <div class="grid grid-cols-3 gap-2 w-full">
                     <div class="text-center">
                         <p class="text-slate-500 font-bold uppercase text-[10px] mb-1">Total SA</p>
@@ -105,7 +110,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="overflow-hidden rounded-2xl border-2 border-indigo-50">
                 <table class="min-w-full">
                     <thead>
@@ -124,10 +128,7 @@
                     </tbody>
                 </table>
             </div>
-
-            <button onclick="muatDataTabel(this)" id="btnRefreshTabel" class="w-full mt-6 bg-indigo-900 hover:bg-black text-white font-bold py-4 rounded-2xl uppercase text-xs transition-all shadow-lg active:scale-95">
-                🔄 Sinkronisasi Data Aktif
-            </button>
+            <button onclick="muatDataTabel(this)" id="btnRefreshTabel" class="w-full mt-6 bg-indigo-900 hover:bg-black text-white font-bold py-4 rounded-2xl uppercase text-xs transition-all shadow-lg active:scale-95">🔄 Sinkronisasi Data Aktif</button>
         </div>
     </div>
 
@@ -179,7 +180,8 @@
                 <option value="1">1</option>
                 <option value="2">2</option>
             </select>
-            <select name="bonus" id="selectBonus" class="input-field md:col-span-2"></select> <textarea name="alamat" placeholder="Alamat Lengkap" rows="2" class="input-field md:col-span-2" required></textarea>
+            <select name="bonus" id="selectBonus" class="input-field md:col-span-2"></select>
+            <textarea name="alamat" placeholder="Alamat Lengkap" rows="2" class="input-field md:col-span-2" required></textarea>
             <div class="md:col-span-2 flex items-center p-4 bg-indigo-50 rounded-xl border-2 border-indigo-100">
                 <input type="checkbox" id="onProgress" name="command" value="on progress" class="w-6 h-6 accent-indigo-600">
                 <label for="onProgress" class="ml-3 font-bold text-indigo-900 uppercase text-xs">Set as "On Progress"</label>
@@ -190,14 +192,10 @@
 
 <div class="mr-template-wrapper">
     <div id="canvasTemplate" style="width: 600px; height: 500px; position: relative; font-family: 'Segoe UI', Arial, sans-serif; background-image: url('https://raw.githubusercontent.com/dwilistyonos-ux/update/refs/heads/main/Hitam%20dan%20Emas%20Minimalis%20Kartu%20Ucapan%20Terima%20Kasih_20251231_091451_0000.png'); background-size: cover; background-position: center; box-sizing: border-box; color: #000000; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 40px 40px 20px 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-        
         <div style="margin-bottom: 15px; position: relative; z-index: 2; width: 100%;">
-            <p id="c-nama" style="font-size: 26px; font-weight: 900; margin: 0; text-transform: uppercase; color: #000000; letter-spacing: 1.5px; text-shadow: 1px 1px 0px rgba(255,255,255,0.4);">
-                -
-            </p>
+            <p id="c-nama" style="font-size: 26px; font-weight: 900; margin: 0; text-transform: uppercase; color: #000000; letter-spacing: 1.5px; text-shadow: 1px 1px 0px rgba(255,255,255,0.4);">-</p>
             <div style="height: 4px; width: 60px; background: linear-gradient(to right, #fa9949, #7332da); margin-top: 6px; border-radius: 2px;"></div>
         </div>
-
         <div style="display: inline-flex; flex-direction: column; gap: 10px; z-index: 2; width: 480px;">
             <div id="group-identitas" style="background: rgba(248, 250, 252, 0.92); padding: 18px; border-radius: 12px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -223,13 +221,11 @@
                     </div>
                 </div>
             </div>
-
             <div id="group-alamat" style="background: rgba(255, 241, 242, 0.94); padding: 12px 18px; border-radius: 12px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                 <p style="font-size: 9px; font-weight: 800; color: #fa9949; margin: 0; text-transform: uppercase; letter-spacing: 0.8px;">Alamat Instalasi</p>
                 <p id="c-alamat" style="font-size: 11px; font-weight: 700; margin: 4px 0 0 0; line-height: 1.4; color: #000000;">-</p>
             </div>
         </div>
-
         <div style="width: 480px; display: flex; justify-content: center; align-items: center; gap: 30px; z-index: 2; margin-top: 18px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <p style="font-size: 10px; font-weight: 800; color: #000000; margin: 0; opacity: 0.7;">AKTIVASI</p>
@@ -251,6 +247,89 @@
     let undoTimeout = null;
     let hiddenBillingIds = JSON.parse(localStorage.getItem('hiddenBillingIds')) || [];
 
+    // --- MODAL SYSTEM FUNCTIONS ---
+    function openModal(config) {
+        const modal = document.getElementById('customModal');
+        const header = document.getElementById('modalHeader');
+        const title = document.getElementById('modalTitle');
+        const body = document.getElementById('modalBody');
+        const subtext = document.getElementById('modalSubtext');
+        const buttons = document.getElementById('modalButtons');
+
+        header.className = `p-4 text-center ${config.headerClass}`;
+        title.innerText = config.title;
+        body.innerHTML = config.body;
+        subtext.innerText = config.subtext;
+        
+        buttons.innerHTML = '';
+        config.buttons.forEach(btn => {
+            const b = document.createElement('button');
+            b.innerText = btn.text;
+            b.className = btn.class;
+            b.onclick = () => { btn.action(); closeModal(); };
+            buttons.appendChild(b);
+        });
+
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('customModal').style.display = 'none';
+    }
+
+    function handleBillingClick(idCst) {
+        const card = document.getElementById(`card-${idCst}`);
+        const nama = card.querySelector('h3').innerText;
+        const alamat = card.querySelector('p:nth-child(5) b').innerText;
+
+        openModal({
+            title: '⚠️ VERIFIKASI PEMBAYARAN',
+            headerClass: 'bg-red-600',
+            body: `<p>${nama}</p><p>${idCst}</p><p class="text-[10px] normal-case opacity-70">${alamat}</p>`,
+            subtext: 'APAKAH PELANGGAN SUDAH BAYAR?',
+            buttons: [
+                { text: 'BATAL', class: 'bg-slate-100 text-slate-500 py-3 rounded-xl font-black text-xs uppercase', action: () => {} },
+                { text: 'YA, SUDAH', class: 'bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg', action: () => executeBilling(idCst) }
+            ]
+        });
+    }
+
+    function handleCopyClick(idCst) {
+        const card = document.getElementById(`card-${idCst}`);
+        const nama = card.querySelector('h3').innerText;
+        const alamat = card.querySelector('p:nth-child(5) b').innerText;
+
+        openModal({
+            title: '📋 SALIN ID PELANGGAN',
+            headerClass: 'bg-indigo-600',
+            body: `<p>${nama}</p><p class="text-indigo-600 text-xl font-black">${idCst}</p><p class="text-[10px] normal-case opacity-70">${alamat}</p>`,
+            subtext: 'ID AKAN DISALIN KE PAPAN KLIP',
+            buttons: [
+                { text: 'BATAL', class: 'bg-slate-100 text-slate-500 py-3 rounded-xl font-black text-xs uppercase', action: () => {} },
+                { text: 'SALIN SEKARANG', class: 'bg-indigo-600 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg', action: () => copyText(idCst) }
+            ]
+        });
+    }
+
+    function executeBilling(idCst) {
+        const card = document.getElementById(`card-${idCst}`);
+        if (card) {
+            card.style.display = 'none';
+            lastDeletedId = idCst;
+            if (!hiddenBillingIds.includes(idCst)) {
+                hiddenBillingIds.push(idCst);
+                localStorage.setItem('hiddenBillingIds', JSON.stringify(hiddenBillingIds));
+                const totalFastEl = document.getElementById('totalFastCount');
+                let currentCount = parseInt(totalFastEl.innerText) || 0;
+                if(currentCount > 0) totalFastEl.innerText = currentCount - 1;
+            }
+            const toast = document.getElementById('undoToast');
+            toast.style.display = 'flex';
+            if(undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { toast.style.display = 'none'; }, 5000); 
+        }
+    }
+
     function formatNomorCantik(hp) {
         if (!hp) return "-";
         let clean = hp.replace(/\D/g, "");
@@ -266,59 +345,31 @@
     }
 
     function copyText(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "COPIED!";
-            btn.classList.replace('bg-indigo-600', 'bg-green-600');
-            
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.classList.replace('bg-green-600', 'bg-indigo-600');
-            }, 1500);
-        }).catch(err => {
+        navigator.clipboard.writeText(text).then(() => {}).catch(err => {
             const textArea = document.createElement("textarea");
             textArea.value = text;
             document.body.appendChild(textArea);
             textArea.select();
-            try {
-                document.execCommand('copy');
-                alert("ID Berhasil disalin: " + text);
-            } catch (err) {
-                console.error('Gagal menyalin text', err);
-            }
+            document.execCommand('copy');
             document.body.removeChild(textArea);
         });
     }
 
     function resetBillingFilter() {
-        if (confirm("Apakah Anda ingin memunculkan kembali semua data yang pernah disembunyikan?")) {
-            hiddenBillingIds = [];
-            localStorage.setItem('hiddenBillingIds', JSON.stringify([]));
-            alert("Filter telah direset. Silakan klik 'Cek Fast' kembali.");
-            cariData('fast'); 
-        }
-    }
-
-    function handleBillingClick(idCst) {
-        if (confirm("⚠️ VERIFIKASI KEAMANAN\nApakah Anda yakin pelanggan ini sudah melakukan pembayaran?")) {
-            const card = document.getElementById(`card-${idCst}`);
-            if (card) {
-                card.style.display = 'none';
-                lastDeletedId = idCst;
-                if (!hiddenBillingIds.includes(idCst)) {
-                    hiddenBillingIds.push(idCst);
-                    localStorage.setItem('hiddenBillingIds', JSON.stringify(hiddenBillingIds));
-                    const totalFastEl = document.getElementById('totalFastCount');
-                    let currentCount = parseInt(totalFastEl.innerText) || 0;
-                    if(currentCount > 0) totalFastEl.innerText = currentCount - 1;
-                }
-                const toast = document.getElementById('undoToast');
-                toast.style.display = 'flex';
-                if(undoTimeout) clearTimeout(undoTimeout);
-                undoTimeout = setTimeout(() => { toast.style.display = 'none'; }, 5000); 
-            }
-        }
+        openModal({
+            title: '🔄 RESET FILTER LIST',
+            headerClass: 'bg-slate-800',
+            body: `<p>ANDA AKAN MEMUNCULKAN KEMBALI SEMUA DATA YANG TERSEMBUNYI</p>`,
+            subtext: 'LANJUTKAN PROSES INI?',
+            buttons: [
+                { text: 'BATAL', class: 'bg-slate-100 text-slate-500 py-3 rounded-xl font-black text-xs uppercase', action: () => {} },
+                { text: 'YA, RESET', class: 'bg-slate-800 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg', action: () => {
+                    hiddenBillingIds = [];
+                    localStorage.setItem('hiddenBillingIds', JSON.stringify([]));
+                    cariData('fast'); 
+                }}
+            ]
+        });
     }
 
     function undoBilling() {
@@ -371,14 +422,30 @@
             if (result.status === "authorized") {
                 document.getElementById('lockScreen').classList.add('hidden');
                 sessionStorage.setItem('isLoggedIn', 'true');
-            } else { alert("❌ PIN SALAH!"); clearPin(); }
+                document.getElementById('resultsList').innerHTML = ""; 
+                sessionStorage.removeItem('last_search_html'); 
+                updateProgressCounter(); 
+                cariData('silent_update'); 
+            } else { 
+                openModal({
+                    title: '❌ PIN SALAH',
+                    headerClass: 'bg-red-600',
+                    body: `<p>PIN YANG ANDA MASUKKAN TIDAK SESUAI</p>`,
+                    subtext: 'SILAKAN COBA LAGI',
+                    buttons: [{ text: 'OK', class: 'bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', action: () => clearPin() }]
+                });
+            }
         } catch (e) { alert("Error koneksi!"); clearPin(); }
         finally { btn.innerHTML = "OK"; }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
         updateBulanDisplay();
-        if (sessionStorage.getItem('isLoggedIn') === 'true') document.getElementById('lockScreen').classList.add('hidden');
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            document.getElementById('lockScreen').classList.add('hidden');
+            updateProgressCounter();
+            cariData('silent_update');
+        }
         
         const selectPaket = document.getElementById('selectPaket');
         for (let i = 10; i <= 1000; i += (i < 100 ? 10 : 50)) {
@@ -405,11 +472,10 @@
                 }
             });
         }
-        const lastResults = sessionStorage.getItem('last_search_html');
-        if(lastResults) { document.getElementById('resultsList').innerHTML = lastResults; }
+        
+        document.getElementById('resultsList').innerHTML = "";
         const savedRekap = localStorage.getItem('myrep_rekap_cache');
         if (savedRekap) { renderRekapUI(JSON.parse(savedRekap)); }
-        updateProgressCounter();
         muatDataTabel(); 
     });
 
@@ -426,7 +492,7 @@
         ['tabInput', 'tabCari', 'tabTabel'].forEach(id => document.getElementById(id).classList.remove('tab-active'));
         document.getElementById('section' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
         document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('tab-active');
-        if(tab === 'cari') updateProgressCounter();
+        if(tab === 'cari') { updateProgressCounter(); }
         if(tab === 'tabel') { updateBulanDisplay(); muatDataTabel(); }
     }
 
@@ -435,14 +501,34 @@
         const query = document.getElementById('userInput').value.trim();
         const tglFilter = document.getElementById('dateInput').value;
         const list = document.getElementById('resultsList');
+        
+        // --- LOGIKA POPUP SERAGAM UNTUK INPUT KOSONG ---
         if (mode === 'search') {
-            if (!query && !tglFilter) { alert("⚠️ Wajib memasukkan Nama, ID CST, atau Filter Tanggal!"); return; }
+            if (!query && !tglFilter) { 
+                openModal({
+                    title: '⚠️ INPUT KOSONG',
+                    headerClass: 'bg-orange-500',
+                    body: `<p>NAMA, ID CST, ATAU TANGGAL BELUM DIISI</p>`,
+                    subtext: 'SILAKAN MASUKKAN KATA KUNCI PENCARIAN',
+                    buttons: [{ 
+                        text: 'MENGERTI', 
+                        class: 'bg-orange-500 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', 
+                        action: () => {} 
+                    }]
+                });
+                return; 
+            }
         }
-        if (mode !== 'silent_update') { list.innerHTML = "<p class='text-white text-center animate-pulse'>🔍 Mencari Data...</p>"; }
+        
+        if (mode !== 'silent_update') { 
+            list.innerHTML = "<p class='text-white text-center animate-pulse'>🔍 Mencari Data...</p>"; 
+        }
+
         try {
             const res = await fetch(`${scriptURL}?id=${encodeURIComponent((mode === 'progress' || mode === 'fast' || mode === 'silent_update') ? '' : query)}`);
             const json = await res.json();
             let items = json.data;
+            
             let allFastItems = items.filter(i => {
                 const parts = i.tanggal.includes('/') ? i.tanggal.split('/') : i.tanggal.split('-');
                 const d = new Date(parts[2], parts[1]-1, parts[0]);
@@ -451,18 +537,23 @@
             });
             let visibleFastItems = allFastItems.filter(i => !hiddenBillingIds.includes(i.idCst));
             document.getElementById('totalFastCount').innerText = visibleFastItems.length;
+
+            if (mode === 'silent_update') return; 
+
             if (mode === 'progress') items = items.filter(i => i.command.toLowerCase().includes('progress'));
             if (mode === 'fast') items = allFastItems;
+            
             if (tglFilter) items = items.filter(i => {
                 let day = i.tanggal.includes('/') ? i.tanggal.split('/')[0] : i.tanggal.split('-')[2];
                 return parseInt(day) == parseInt(tglFilter);
             });
-            if (mode === 'silent_update') return;
+
             if (!items.length) { 
                 list.innerHTML = "<p class='text-white text-center font-bold bg-white/10 p-4 rounded-xl'>Nol Data Ditemukan.</p>"; 
                 sessionStorage.removeItem('last_search_html');
                 return; 
             }
+
             list.innerHTML = "";
             let htmlContent = "";
             if (mode === 'fast') {
@@ -490,7 +581,9 @@
             }
             list.innerHTML = htmlContent;
             sessionStorage.setItem('last_search_html', htmlContent);
-        } catch (e) { if(mode !== 'silent_update') list.innerHTML = "<p class='text-white text-center'>Gagal memuat data.</p>"; }
+        } catch (e) { 
+            if(mode !== 'silent_update') list.innerHTML = "<p class='text-white text-center'>Gagal memuat data.</p>"; 
+        }
     }
 
     function renderCard(item, mode) {
@@ -501,12 +594,9 @@
         const diffDays = Math.ceil(Math.abs(today - pasangDate) / (1000 * 60 * 60 * 24));
         
         let cardColorClass = (diffDays <= 10) ? "card-red border-red-200" : (diffDays <= 60 ? "card-orange border-orange-200" : "card-blue border-blue-200");
-        
         let statusLabel = (diffDays <= 10) ? `<span class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">${diffDays} HARI</span>` : (diffDays <= 60 ? '<span class="bg-orange-500 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">BARU</span>' : '<span class="bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">LAMA</span>');
-        
         const isProg = item.command.toLowerCase().includes('progress');
         const commandHtml = item.command && item.command.trim() !== "" ? `<p class="col-span-2 border-t pt-1 mt-1 text-indigo-700 font-semibold">📝 Command: <i>${item.command}</i></p>` : "";
-        
         const billingBtn = (mode === 'fast') ? `<button onclick="handleBillingClick('${item.idCst}')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Billing</button>` : "";
 
         return `
@@ -515,10 +605,9 @@
                     <h3 class="font-black text-indigo-900 uppercase text-lg leading-tight blink-name">${item.nama}</h3>
                     <div class="flex gap-2 mt-2">
                         ${billingBtn}
-                        <button onclick="copyText('${item.idCst}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Salin ID</button>
+                        <button onclick="handleCopyClick('${item.idCst}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Salin ID</button>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-slate-600 bg-white/50 p-3 rounded-xl mb-3 border border-slate-200">
                     <p class="col-span-2 flex items-center bg-white p-1.5 rounded border border-indigo-100 mb-1">
                         <span>🆔 ID: <b class="text-indigo-900">${item.idCst}</b></span>
@@ -530,7 +619,6 @@
                     <p class="col-span-2">📍 Alamat: <b>${item.alamat}</b></p>
                     ${commandHtml}
                 </div>
-                
                 <div class="flex gap-2">
                     <button onclick="prosesWa('${item.hp}', '${item.idCst}', '${item.nama}', '${item.japo}', '${item.paket}')" class="flex-1 bg-green-500 text-white font-black py-3 rounded-xl text-xs hover:bg-green-600 shadow-lg transition-all active:scale-95">KIRIM NOTIFIKASI WA</button>
                 </div>
@@ -543,17 +631,10 @@
             const email = cardEl ? cardEl.getAttribute('data-email') || '-' : '-';
             const alamat = cardEl ? cardEl.querySelector('p:nth-child(5) b').innerText : '-';
             const tgl = cardEl ? cardEl.querySelector('p:nth-child(2) b').innerText : '-';
-            
-            // --- LOGIKA PENENTU PESAN OTOMATIS ---
             const tglParts = tgl.split('/');
             const pasangDate = new Date(tglParts[2], tglParts[1] - 1, tglParts[0]);
             const today = new Date();
-            
-            // Menghitung selisih hari
-            const diffTime = Math.abs(today - pasangDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            // Penentu Salam
+            const diffDays = Math.ceil(Math.abs(today - pasangDate) / (1000 * 60 * 60 * 24));
             const hours = today.getHours();
             let salam = "Malam";
             if (hours >= 5 && hours < 11) salam = "Pagi";
@@ -561,47 +642,27 @@
             else if (hours >= 15 && hours < 18) salam = "Sore";
 
             let text = "";
-
             if (diffDays > 10) {
-                // PESAN FOLLOW-UP KUALITAS (> 10 HARI)
                 text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic apakah selama ini ada kendala. Mohon diinfokan apabila ada trouble kendalanya agar segera diperbaiki oleh Tim kami. Terima kasih.`;
             } else if (diffDays <= 2) {
-                // PENGINGAT TAGIHAN 1
-                text = `Selamat ${salam}. *PENGINGAT TAGIHAN MyRepublic*%0A%0A` +
-                       `Pelanggan yth. *${nama.trim()}*,%0A` +
-                       `Semoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A` +
-                       `🆔 ID Pelanggan: *${id}*%0A` +
-                       `🚀 Paket: *${paket}*%0A` +
-                       `🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A` +
-                       `_Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A` +
-                       `*Penting:*%0A` +
-                       `• Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0A` +
-                       `Terima kasih.`;
+                text = `Selamat ${salam}. *PENGINGAT TAGIHAN MyRepublic*%0A%0A Pelanggan yth. *${nama.trim()}*,%0A Semoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A 🆔 ID Pelanggan: *${id}*%0A 🚀 Paket: *${paket}*%0A 🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A _Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A *Penting:*%0A • Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0A Terima kasih.`;
             } else if (diffDays >= 3 && diffDays <= 5) {
                 text = `Selamat ${salam} Bpk/Ibu. Mengingatkan tagihan a/n *${nama.trim()}* dengan ID Pelanggan *${id}* sudah dapat dilakukan pembayaran. Terima kasih.`;
             } else {
-                text = `Selamat ${salam}. Bpk/Ibu *${nama.trim()}* saat ini sudah melewati jatuh tempo dengan ID Pelanggan *${id}*.%0A%0A` +
-                       `Segera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis. Terima kasih.`;
+                text = `Selamat ${salam}. Bpk/Ibu *${nama.trim()}* saat ini sudah melewati jatuh tempo dengan ID Pelanggan *${id}*.%0A%0A Segera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis. Terima kasih.`;
             }
 
-            // Jalankan download kartu
             await downloadImage(nama, id, paket, alamat, tgl, japo, hp, email);
-            
-            // Proses HP
             let cleanHp = hp.replace(/\D/g, "");
             if (cleanHp.startsWith("0")) cleanHp = "62" + cleanHp.slice(1);
-            
             const waAppUrl = `whatsapp://send?phone=${cleanHp}&text=${text}`;
             const waWebUrl = `https://api.whatsapp.com/send?phone=${cleanHp}&text=${text}`;
-
             window.location.href = waAppUrl;
             setTimeout(() => { if (document.hasFocus()) { window.open(waWebUrl, '_blank'); } }, 500);
-
             await new Promise(resolve => setTimeout(resolve, 5000));
             fetch(`${scriptURL}?action=hapusProgress&idCst=${id}`); 
             updateProgressCounter();
-
-        } catch(e) { console.error("Error dalam proses kirim pesan:", e); }
+        } catch(e) { console.error("Error:", e); }
     }
 
     async function muatDataTabel(btnEl) {
@@ -647,11 +708,25 @@
             const response = await fetch(scriptURL, { method: 'POST', body: formData });
             const result = await response.text();
             if(result === "Success") {
-                alert("✅ Data Berhasil Masuk!");
+                openModal({
+                    title: '✅ BERHASIL',
+                    headerClass: 'bg-green-600',
+                    body: `<p>DATA PELANGGAN TELAH TERSIMPAN</p>`,
+                    subtext: 'DATABASE TELAH DIPERBARUI',
+                    buttons: [{ text: 'OK', class: 'bg-green-600 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', action: () => {} }]
+                });
                 e.target.reset();
                 localStorage.removeItem('myrep_form_draft'); 
                 updateProgressCounter(); muatDataTabel(); 
-            } else if(result === "DUPLICATE_ID") { alert("❌ Gagal! ID CST sudah ada."); }
+            } else if(result === "DUPLICATE_ID") { 
+                openModal({
+                    title: '❌ DUPLIKAT DATA',
+                    headerClass: 'bg-red-600',
+                    body: `<p>ID CST SUDAH TERDAFTAR</p>`,
+                    subtext: 'SILAKAN PERIKSA KEMBALI',
+                    buttons: [{ text: 'OK', class: 'bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', action: () => {} }]
+                });
+            }
         } catch (err) { alert("Masalah Koneksi!"); }
         finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
     });
@@ -676,11 +751,13 @@
         try {
             const element = document.getElementById('canvasTemplate');
             const canvas = await html2canvas(element, { scale: 3, useCORS: true, logging: false, backgroundColor: null });
+            const now = new Date();
+            const timestamp = now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0') + "_" + now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0') + now.getSeconds().toString().padStart(2, '0');
             const link = document.createElement('a');
-            link.download = `Kartu_${(nama || 'Pelanggan').replace(/\s+/g, '_')}.png`;
+            link.download = `Kartu_${(nama || 'Pelanggan').replace(/\s+/g, '_')}_${timestamp}.png`;
             link.href = canvas.toDataURL("image/png");
             link.click();
-        } catch (error) { console.error("Gagal mengunduh kartu:", error); }
+        } catch (error) { console.error("Error download:", error); }
     }
 </script>
 </body>
