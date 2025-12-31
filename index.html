@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -243,13 +241,13 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx5G211urHDthFnJyT2eUN6KRYrKLmkgVh9cq87hSCTmyZgtefXKqbSfBu8RAsOBoQm/exec'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz4kKkoFmTtP0AAbNu2GtnlcMUgjCTJYe_qLvOqUUhJmkNTZxyzNwMF5hHc9y41JNbe/exec'; 
 
     let lastDeletedId = null;
     let undoTimeout = null;
     let hiddenBillingIds = JSON.parse(localStorage.getItem('hiddenBillingIds')) || [];
 
-    // --- MODAL SYSTEM (ORIGINAL) ---
+    // --- MODAL SYSTEM ---
     function openModal(config) {
         const modal = document.getElementById('customModal');
         const header = document.getElementById('modalHeader');
@@ -346,7 +344,6 @@
         } catch(e) { console.error("Error pada proses WA:", e); }
     }
 
-    // --- RENDER CARD (UPDATED WITH MODE) ---
     function renderCard(item, mode) {
         if (mode === 'fast' && hiddenBillingIds.includes(item.idCst)) { return ""; }
         
@@ -387,7 +384,6 @@
             </div>`;
     }
 
-    // --- CORE APP LOGIC (ORIGINAL REMAINING) ---
     function handleBillingClick(idCst) {
         const card = document.getElementById(`card-${idCst}`);
         const nama = card.querySelector('h3').innerText;
@@ -587,6 +583,13 @@
             const res = await fetch(`${scriptURL}?id=${encodeURIComponent((mode === 'progress' || mode === 'fast' || mode === 'silent_update') ? '' : query)}`);
             const json = await res.json();
             let items = json.data;
+
+            // --- FILTER: Hapus data yang mengandung kata "OFF" (Case Insensitive) pada ID atau Command ---
+            items = items.filter(i => {
+                const idCstStr = String(i.idCst).toLowerCase();
+                const commandStr = String(i.command || "").toLowerCase();
+                return !idCstStr.includes('off') && !commandStr.includes('off');
+            });
             
             let allFastItems = items.filter(i => {
                 const parts = i.tanggal.includes('/') ? i.tanggal.split('/') : i.tanggal.split('-');
