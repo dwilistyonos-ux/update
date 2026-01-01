@@ -375,6 +375,7 @@
                     <p>🗓️ Pasang: <b>${item.tanggal}</b></p>
                     <p>🔔 JAPO: <b class="text-red-500">Tgl ${item.japo}</b></p>
                     <p class="col-span-2">🚀 Paket: <b>${item.paket}</b></p>
+                    <p class="col-span-2">📧 Email: <b>${item.email || '-'}</b></p>
                     <p class="col-span-2">📍 Alamat: <b>${item.alamat}</b></p>
                     ${commandHtml}
                 </div>
@@ -387,7 +388,7 @@
     function handleBillingClick(idCst) {
         const card = document.getElementById(`card-${idCst}`);
         const nama = card.querySelector('h3').innerText;
-        const alamat = card.querySelector('p:nth-child(5) b').innerText;
+        const alamat = card.querySelector('p:nth-child(6) b').innerText; // Diubah index-nya karena ada baris email
         openModal({
             title: '⚠️ VERIFIKASI PEMBAYARAN',
             headerClass: 'bg-red-600',
@@ -403,7 +404,7 @@
     function handleCopyClick(idCst) {
         const card = document.getElementById(`card-${idCst}`);
         const nama = card.querySelector('h3').innerText;
-        const alamat = card.querySelector('p:nth-child(5) b').innerText;
+        const alamat = card.querySelector('p:nth-child(6) b').innerText; // Diubah index-nya karena ada baris email
         openModal({
             title: '📋 SALIN ID PELANGGAN',
             headerClass: 'bg-indigo-600',
