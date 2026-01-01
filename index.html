@@ -566,8 +566,17 @@
 
     async function cariData(mode, btnEl) {
         if(btnEl) triggerAnimate(btnEl); 
-        const query = document.getElementById('userInput').value.trim();
-        const tglFilter = document.getElementById('dateInput').value;
+        let query = document.getElementById('userInput').value.trim();
+        let tglFilter = document.getElementById('dateInput').value;
+
+        // --- REVISI: DETEKSI DAN PINDAH ID DARI KOLOM TANGGAL ---
+        if (tglFilter && parseInt(tglFilter) > 31) {
+            document.getElementById('userInput').value = tglFilter;
+            document.getElementById('dateInput').value = "";
+            query = tglFilter;
+            tglFilter = "";
+        }
+
         const list = document.getElementById('resultsList');
         
         if (mode === 'search') {
