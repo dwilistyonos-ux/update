@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -33,10 +34,6 @@
         .group-header { background: rgba(255, 255, 255, 0.2); padding: 8px 15px; border-radius: 10px; color: white; font-weight: 900; font-size: 12px; margin: 15px 0 10px 0; border: 1px dashed rgba(255,255,255,0.3); text-align: center; text-transform: uppercase; }
         .stats-group { background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 20px; padding: 15px; margin-bottom: 24px; }
         #undoToast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; }
-
-        .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 99px; height: 12px; overflow: hidden; margin-top: 10px; border: 1px solid #cbd5e1; }
-        .progress-bar-fill { height: 100%; width: 0%; transition: width 1s ease-in-out, background-color 0.5s; }
-        .wa-log-tag { font-size: 9px; font-weight: 900; color: #059669; background: #ecfdf5; padding: 2px 6px; border-radius: 6px; border: 1px solid #10b981; margin-top: 5px; display: inline-block; }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center">
@@ -111,15 +108,6 @@
                     <div class="text-center">
                         <p class="text-orange-600 font-bold uppercase text-[10px] mb-1">Point Kurang</p>
                         <p id="t-kurang" class="text-xl font-black text-orange-700">0</p>
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-slate-200">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-[10px] font-black text-slate-500 uppercase">Target Achievement</span>
-                        <span id="targetPercentText" class="text-[10px] font-black text-indigo-600">0%</span>
-                    </div>
-                    <div class="progress-container">
-                        <div id="targetProgressBar" class="progress-bar-fill"></div>
                     </div>
                 </div>
             </div>
@@ -254,7 +242,7 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzL6D6K2uWGz-9RhUcFh0fieMokrfHXOnu0CEgPm-g1a9qSV8jEMowTDHK3WVtypQHv/exec'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz4kKkoFmTtP0AAbNu2GtnlcMUgjCTJYe_qLvOqUUhJmkNTZxyzNwMF5hHc9y41JNbe/exec'; 
 
     let lastDeletedId = null;
     let undoTimeout = null;
@@ -294,7 +282,7 @@
     async function prosesWa(hp, id, nama, japo, paket, source = 'general') {
         const cardEl = document.getElementById(`card-${id}`);
         const email = cardEl ? cardEl.getAttribute('data-email') || '-' : '-';
-        const alamat = cardEl ? cardEl.querySelector('p:nth-child(6) b').innerText : '-';
+        const alamat = cardEl ? cardEl.querySelector('p:nth-child(5) b').innerText : '-';
         const tgl = cardEl ? cardEl.querySelector('p:nth-child(2) b').innerText : '-';
 
         openModal({
@@ -319,7 +307,6 @@
 
     async function executeWaAction(hp, id, nama, japo, paket, alamat, tgl, email, withText, source) {
         try {
-            saveWaLog(id);
             let text = "";
             if (withText) {
                 const tglParts = tgl.split('/'); 
@@ -338,7 +325,7 @@
                 } else if (diffDays >= 6 && diffDays <= 10) {
                     text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saat ini tagihan ID Pelanggan *${id}* sudah melewati jatuh tempo.%0A%0ASegera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis oleh sistem. Terima kasih.`;
                 } else {
-                    text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic apakah selama ini ada kendala. Mohon diinfokan apabila ada trouble agar segera dibantu oleh Tim kami. Terima kasih.`;
+                    text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic<br>apakah selama ini ada kendala.</br>Mohon diinfokan apabila ada trouble agar segera dibantu oleh Tim kami.<br>Terima kasih.</br>`;
                 }
                 await downloadImage(nama, id, paket, alamat, tgl, japo, hp, email);
             }
@@ -358,20 +345,6 @@
         } catch(e) { console.error("Error pada proses WA:", e); }
     }
 
-    function saveWaLog(idCst) {
-        let logs = JSON.parse(localStorage.getItem('wa_logs')) || {};
-        const now = new Date();
-        logs[idCst] = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-        localStorage.setItem('wa_logs', JSON.stringify(logs));
-        
-        const card = document.getElementById(`card-${idCst}`);
-        if(card) {
-            const existingLog = card.querySelector('.wa-log-tag');
-            if(existingLog) existingLog.remove();
-            card.querySelector('h3').insertAdjacentHTML('afterend', `<span class="wa-log-tag">✅ Terakhir: ${logs[idCst]}</span>`);
-        }
-    }
-
     function renderCard(item, mode) {
         if (mode === 'fast' && hiddenBillingIds.includes(item.idCst)) { return ""; }
         
@@ -386,14 +359,10 @@
         const commandHtml = item.command && item.command.trim() !== "" ? `<p class="col-span-2 border-t pt-1 mt-1 text-indigo-700 font-semibold">📝 Command: <i>${item.command}</i></p>` : "";
         const billingBtn = (mode === 'fast') ? `<button onclick="handleBillingClick('${item.idCst}')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Billing</button>` : "";
 
-        const waLogs = JSON.parse(localStorage.getItem('wa_logs')) || {};
-        const logHtml = waLogs[item.idCst] ? `<span class="wa-log-tag">✅ Terakhir: ${waLogs[item.idCst]}</span>` : "";
-
         return `
             <div id="card-${item.idCst}" data-email="${item.email || '-'}" class="glass-card p-5 shadow-xl border-l-[12px] mb-4 ${cardColorClass} ${isProg ? 'border-orange-500' : ''}">
                 <div class="mb-3">
                     <h3 class="font-black text-indigo-900 uppercase text-lg leading-tight blink-name">${item.nama}</h3>
-                    ${logHtml}
                     <div class="flex gap-2 mt-2">
                         ${billingBtn}
                         <button onclick="handleCopyClick('${item.idCst}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Salin ID</button>
@@ -407,7 +376,6 @@
                     <p>🗓️ Pasang: <b>${item.tanggal}</b></p>
                     <p>🔔 JAPO: <b class="text-red-500">Tgl ${item.japo}</b></p>
                     <p class="col-span-2">🚀 Paket: <b>${item.paket}</b></p>
-                    <p class="col-span-2">📧 Email: <b>${item.email || '-'}</b></p>
                     <p class="col-span-2">📍 Alamat: <b>${item.alamat}</b></p>
                     ${commandHtml}
                 </div>
@@ -420,7 +388,7 @@
     function handleBillingClick(idCst) {
         const card = document.getElementById(`card-${idCst}`);
         const nama = card.querySelector('h3').innerText;
-        const alamat = card.querySelector('p:nth-child(6) b').innerText;
+        const alamat = card.querySelector('p:nth-child(5) b').innerText;
         openModal({
             title: '⚠️ VERIFIKASI PEMBAYARAN',
             headerClass: 'bg-red-600',
@@ -436,7 +404,7 @@
     function handleCopyClick(idCst) {
         const card = document.getElementById(`card-${idCst}`);
         const nama = card.querySelector('h3').innerText;
-        const alamat = card.querySelector('p:nth-child(6) b').innerText;
+        const alamat = card.querySelector('p:nth-child(5) b').innerText;
         openModal({
             title: '📋 SALIN ID PELANGGAN',
             headerClass: 'bg-indigo-600',
@@ -599,16 +567,8 @@
 
     async function cariData(mode, btnEl) {
         if(btnEl) triggerAnimate(btnEl); 
-        let query = document.getElementById('userInput').value.trim();
-        let tglFilter = document.getElementById('dateInput').value;
-
-        if (tglFilter && parseInt(tglFilter) > 31) {
-            document.getElementById('userInput').value = tglFilter;
-            document.getElementById('dateInput').value = "";
-            query = tglFilter;
-            tglFilter = "";
-        }
-
+        const query = document.getElementById('userInput').value.trim();
+        const tglFilter = document.getElementById('dateInput').value;
         const list = document.getElementById('resultsList');
         
         if (mode === 'search') {
@@ -625,6 +585,7 @@
             const json = await res.json();
             let items = json.data;
 
+            // --- FILTER: Hapus data yang mengandung kata "OFF" (Case Insensitive) pada ID atau Command ---
             items = items.filter(i => {
                 const idCstStr = String(i.idCst).toLowerCase();
                 const commandStr = String(i.command || "").toLowerCase();
@@ -700,9 +661,7 @@
         finally { btn.innerText = originalText; }
     }
 
-    // --- FUNGSI REKAP UI DENGAN LOGIKA TARGET DINAMIS ---
     function renderRekapUI(d) {
-        // Menampilkan angka dasar
         document.getElementById('t-sa').innerText = d.totalSA || 0;
         document.getElementById('t-off').innerText = d.totalOff || 0;
         document.getElementById('t-aktif').innerText = d.pelangganAktif || 0;
@@ -710,35 +669,6 @@
         document.getElementById('t-point').innerText = d.totalPoint || 0;
         document.getElementById('t-kurang').innerText = d.pointKurang || 0;
         document.getElementById('t-bonus').innerText = d.totalBonus || 'Rp0';
-
-        // LOGIKA TARGET DARI SPREADSHEET
-        const currentPoint = parseFloat(d.totalPoint) || 0;
-        const targetPoint = parseFloat(d.target) || 15; // Mengambil nilai target (default 15 jika kosong)
-        
-        let percent = 0;
-        if (targetPoint > 0) {
-            percent = Math.min((currentPoint / targetPoint) * 100, 100);
-        }
-        
-        const bar = document.getElementById('targetProgressBar');
-        const text = document.getElementById('targetPercentText');
-        const labelTarget = document.querySelector('.stats-group span.text-slate-500'); 
-        
-        // Memperbarui label teks agar user tahu berapa targetnya
-        if(labelTarget) labelTarget.innerText = `Target Achievement (Goal: ${targetPoint} Pts)`;
-        
-        // Animasi Progress Bar
-        bar.style.width = percent + '%';
-        text.innerText = Math.round(percent) + '%';
-        
-        // Perubahan warna bar berdasarkan pencapaian
-        if(percent < 40) {
-            bar.style.backgroundColor = '#ef4444'; // Merah
-        } else if(percent < 80) {
-            bar.style.backgroundColor = '#f59e0b'; // Kuning/Orange
-        } else {
-            bar.style.backgroundColor = '#10b981'; // Hijau
-        }
     }
 
     async function updateProgressCounter() {
