@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyRepublic System - Professional</title>
+    <title>MyRepublic System - Professional Unified</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -34,6 +33,8 @@
         .group-header { background: rgba(255, 255, 255, 0.2); padding: 8px 15px; border-radius: 10px; color: white; font-weight: 900; font-size: 12px; margin: 15px 0 10px 0; border: 1px dashed rgba(255,255,255,0.3); text-align: center; text-transform: uppercase; }
         .stats-group { background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 20px; padding: 15px; margin-bottom: 24px; }
         #undoToast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; }
+        .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 99px; height: 12px; overflow: hidden; margin-top: 10px; border: 1px solid #cbd5e1; }
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 1s ease-in-out, background-color 0.5s; }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center">
@@ -102,17 +103,26 @@
                         <p id="t-sa" class="text-xl font-black text-indigo-900">0</p>
                     </div>
                     <div class="text-center border-x-2 border-slate-200">
-                        <p class="text-indigo-600 font-bold uppercase text-[10px] mb-1">Total Point</p>
-                        <p id="t-point" class="text-xl font-black text-indigo-900">0</p>
+                        <p class="text-red-600 font-bold uppercase text-[10px] mb-1">SA KURANG</p>
+                        <p id="t-point" class="text-xl font-black text-red-600">0</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-orange-600 font-bold uppercase text-[10px] mb-1">Point Kurang</p>
-                        <p id="t-kurang" class="text-xl font-black text-orange-700">0</p>
+                        <p id="label-kurang" class="text-indigo-600 font-bold uppercase text-[10px] mb-1">SA BLN LALU</p>
+                        <p id="t-kurang" class="text-xl font-black text-indigo-900">0</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black text-slate-500 uppercase">Target Achievement</span>
+                        <span id="targetPercentText" class="text-[10px] font-black text-indigo-600">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="targetProgressBar" class="progress-bar-fill"></div>
                     </div>
                 </div>
             </div>
             <div class="overflow-hidden rounded-2xl border-2 border-indigo-50">
-                <table class="min-w-full">
+                <table>
                     <thead>
                         <tr>
                             <th class="bg-red-600 text-white py-4 border-none text-center" style="width: 33.33%;">STATUS OFF</th>
@@ -152,8 +162,8 @@
             <input type="number" id="dateInput" placeholder="Filter Tanggal (1-31)" min="1" max="31" class="input-field mb-3">
             <div class="grid grid-cols-3 gap-3">
                 <button onclick="cariData('search', this)" class="bg-indigo-600 text-white font-black py-4 rounded-xl uppercase text-xs transition-all active:scale-95">Cari</button>
-                <button onclick="cariData('progress', this)" class="bg-orange-600 text-white font-black py-4 rounded-xl uppercase text-xs transition-all active:scale-95">Cek Progress</button>
-                <button onclick="cariData('fast', this)" class="bg-red-600 text-white font-black py-4 rounded-xl uppercase text-xs transition-all active:scale-95">Cek Fast</button>
+                <button onclick="cariData('progress', this)" class="bg-orange-600 text-white font-black py-4 rounded-xl uppercase text-xs transition-all active:scale-95">Progress</button>
+                <button onclick="cariData('fast', this)" class="bg-red-600 text-white font-black py-4 rounded-xl uppercase text-xs transition-all active:scale-95">Fast</button>
             </div>
         </div>
         <div id="resultsList" class="space-y-4 pb-10"></div>
@@ -174,14 +184,26 @@
             <input type="number" name="id_cst" placeholder="ID CST" class="input-field" required>
             <input type="email" name="email" placeholder="Email" class="input-field" required>
             <input type="tel" name="hp" id="inputHp" placeholder="No HP (08...)" class="input-field" required>
-            <select name="paket" id="selectPaket" class="input-field" required><option value="">-- Pilih Paket --</option></select>
-            <select name="point" class="input-field" required>
-                <option value="">--Point--</option>
-                <option value="0,25">0,25</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
+            <select name="paket" id="selectPaket" class="input-field md:col-span-2" required>
+                <option value="">-- Paket --</option>
+                <option value="10Mbps">10Mbps</option>
+                <option value="Eco15">Eco15</option>
+                <option value="Eco20">Eco20</option>
+                <option value="Jet20">Jet20</option>
+                <option value="Value30">Value30</option>
+                <option value="LiteNeo100">LiteNeo100</option>
+                <option value="Value30Fast50">Value30Fast50</option>
+                <option value="Velo150">Velo150</option>
+                <option value="Nova100">Nova100</option>
+                <option value="Nexus300">Nexus300</option>
+                <option value="Gamer250">Gamer250</option>
+                <option value="Prime500">Prime500</option>
+                <option value="Gamer500">Gamer500</option>
+                <option value="Wonder750">Wonder750</option>
+                <option value="Gamer750">Gamer750</option>
+                <option value="Ultra1Gbps">Ultra1Gbps</option>
+                <option value="Gamer1Gbps">Gamer1Gbps</option>
             </select>
-            <select name="bonus" id="selectBonus" class="input-field md:col-span-2"></select>
             <textarea name="alamat" placeholder="Alamat Lengkap" rows="2" class="input-field md:col-span-2" required></textarea>
             <div class="md:col-span-2 flex items-center p-4 bg-indigo-50 rounded-xl border-2 border-indigo-100">
                 <input type="checkbox" id="onProgress" name="command" value="on progress" class="w-6 h-6 accent-indigo-600">
@@ -191,61 +213,61 @@
         </form>
     </div>
 
-<div class="mr-template-wrapper">
-    <div id="canvasTemplate" style="width: 600px; height: 500px; position: relative; font-family: 'Segoe UI', Arial, sans-serif; background-image: url('https://raw.githubusercontent.com/dwilistyonos-ux/update/refs/heads/main/Hitam%20dan%20Emas%20Minimalis%20Kartu%20Ucapan%20Terima%20Kasih_20251231_091451_0000.png'); background-size: cover; background-position: center; box-sizing: border-box; color: #000000; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 40px 40px 20px 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-        <div style="margin-bottom: 15px; position: relative; z-index: 2; width: 100%;">
-            <p id="c-nama" style="font-size: 26px; font-weight: 900; margin: 0; text-transform: uppercase; color: #000000; letter-spacing: 1.5px; text-shadow: 1px 1px 0px rgba(255,255,255,0.4);">-</p>
-            <div style="height: 4px; width: 60px; background: linear-gradient(to right, #fa9949, #7332da); margin-top: 6px; border-radius: 2px;"></div>
-        </div>
-        <div style="display: inline-flex; flex-direction: column; gap: 10px; z-index: 2; width: 480px;">
-            <div id="group-identitas" style="background: rgba(248, 250, 252, 0.92); padding: 18px; border-radius: 12px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <div style="margin-bottom: 10px;">
-                            <p style="font-size: 9px; font-weight: 800; color: #116b1a; margin: 0; text-transform: uppercase; opacity: 0.5; letter-spacing: 0.5px;">ID PEMBAYARAN</p>
-                            <p id="c-id-bayar" style="font-size: 16px; font-weight: 900; margin: 2px 0 0 0; color: #000000;">-</p>
-                        </div>
+    <div class="mr-template-wrapper">
+        <div id="canvasTemplate" style="width: 600px; height: 500px; position: relative; font-family: 'Segoe UI', Arial, sans-serif; background-image: url('https://raw.githubusercontent.com/dwilistyonos-ux/update/refs/heads/main/Hitam%20dan%20Emas%20Minimalis%20Kartu%20Ucapan%20Terima%20Kasih_20251231_091451_0000.png'); background-size: cover; background-position: center; box-sizing: border-box; color: #000000; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 40px 40px 20px 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div style="margin-bottom: 15px; position: relative; z-index: 2; width: 100%;">
+                <p id="c-nama" style="font-size: 26px; font-weight: 900; margin: 0; text-transform: uppercase; color: #000000; letter-spacing: 1.5px; text-shadow: 1px 1px 0px rgba(255,255,255,0.4);">-</p>
+                <div style="height: 4px; width: 60px; background: linear-gradient(to right, #fa9949, #7332da); margin-top: 6px; border-radius: 2px;"></div>
+            </div>
+            <div style="display: inline-flex; flex-direction: column; gap: 10px; z-index: 2; width: 480px;">
+                <div id="group-identitas" style="background: rgba(248, 250, 252, 0.92); padding: 18px; border-radius: 12px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                         <div>
-                            <p style="font-size: 9px; font-weight: 800; color: #7332da; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">NOMOR HP</p>
-                            <p id="c-hp" style="font-size: 14px; font-weight: 700; margin: 2px 0 0 0; color: #000000;">-</p>
+                            <div style="margin-bottom: 10px;">
+                                <p style="font-size: 9px; font-weight: 800; color: #116b1a; margin: 0; text-transform: uppercase; opacity: 0.5; letter-spacing: 0.5px;">ID PEMBAYARAN</p>
+                                <p id="c-id-bayar" style="font-size: 16px; font-weight: 900; margin: 2px 0 0 0; color: #000000;">-</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 9px; font-weight: 800; color: #7332da; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">NOMOR HP</p>
+                                <p id="c-hp" style="font-size: 14px; font-weight: 700; margin: 2px 0 0 0; color: #000000;">-</p>
+                            </div>
                         </div>
-                    </div>
-                    <div style="border-left: 1px solid rgba(0,0,0,0.08); padding-left: 20px;">
-                        <div style="margin-bottom: 10px;">
-                            <p style="font-size: 9px; font-weight: 800; color: #116b1a; margin: 0; text-transform: uppercase; opacity: 0.5; letter-spacing: 0.5px;">PAKET</p>
-                            <p id="c-paket" style="font-size: 14px; font-weight: 700; margin: 2px 0 0 0; color: #000000;">-</p>
-                        </div>
-                        <div>
-                            <p style="font-size: 9px; font-weight: 800; color: #7332da; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">EMAIL</p>
-                            <p id="c-email" style="font-size: 11px; font-weight: 700; margin: 2px 0 0 0; word-break: break-all; color: #000000; line-height: 1.1;">-</p>
+                        <div style="border-left: 1px solid rgba(0,0,0,0.08); padding-left: 20px;">
+                            <div style="margin-bottom: 10px;">
+                                <p style="font-size: 9px; font-weight: 800; color: #116b1a; margin: 0; text-transform: uppercase; opacity: 0.5; letter-spacing: 0.5px;">PAKET</p>
+                                <p id="c-paket" style="font-size: 14px; font-weight: 700; margin: 2px 0 0 0; color: #000000;">-</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 9px; font-weight: 800; color: #7332da; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">EMAIL</p>
+                                <p id="c-email" style="font-size: 11px; font-weight: 700; margin: 2px 0 0 0; word-break: break-all; color: #000000; line-height: 1.1;">-</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div id="group-alamat" style="background: rgba(255, 241, 242, 0.94); padding: 12px 18px; border-radius: 12px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <p style="font-size: 9px; font-weight: 800; color: #fa9949; margin: 0; text-transform: uppercase; letter-spacing: 0.8px;">Alamat Instalasi</p>
+                    <p id="c-alamat" style="font-size: 11px; font-weight: 700; margin: 4px 0 0 0; line-height: 1.4; color: #000000;">-</p>
+                </div>
             </div>
-            <div id="group-alamat" style="background: rgba(255, 241, 242, 0.94); padding: 12px 18px; border-radius: 12px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <p style="font-size: 9px; font-weight: 800; color: #fa9949; margin: 0; text-transform: uppercase; letter-spacing: 0.8px;">Alamat Instalasi</p>
-                <p id="c-alamat" style="font-size: 11px; font-weight: 700; margin: 4px 0 0 0; line-height: 1.4; color: #000000;">-</p>
-            </div>
-        </div>
-        <div style="width: 480px; display: flex; justify-content: center; align-items: center; gap: 30px; z-index: 2; margin-top: 18px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <p style="font-size: 10px; font-weight: 800; color: #000000; margin: 0; opacity: 0.7;">AKTIVASI</p>
-                <p id="c-tgl" style="font-size: 12px; font-weight: 900; color: #000000; margin: 0;">-</p>
-            </div>
-            <div style="width: 1px; height: 15px; background: rgba(0,0,0,0.2);"></div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <p style="font-size: 10px; font-weight: 800; color: #000000; margin: 0; opacity: 0.7;">JATUH TEMPO</p>
-                <p style="font-size: 12px; font-weight: 900; color: #000000; margin: 0;">TGL <span id="c-japo">-</span></p>
+            <div style="width: 480px; display: flex; justify-content: center; align-items: center; gap: 30px; z-index: 2; margin-top: 18px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <p style="font-size: 10px; font-weight: 800; color: #000000; margin: 0; opacity: 0.7;">AKTIVASI</p>
+                    <p id="c-tgl" style="font-size: 12px; font-weight: 900; color: #000000; margin: 0;">-</p>
+                </div>
+                <div style="width: 1px; height: 15px; background: rgba(0,0,0,0.2);"></div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <p style="font-size: 10px; font-weight: 800; color: #000000; margin: 0; opacity: 0.7;">JATUH TEMPO</p>
+                    <p style="font-size: 12px; font-weight: 900; color: #000000; margin: 0;">TGL <span id="c-japo">-</span></p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 <script>
+    // URL Web App Google Apps Script
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwdbFHl7vkdiRd68aX-mtj_UEsql5pJl8sHSNbPt1EXhXr2AH_40f8I0lERTMCpXch0/exec'; 
 
     let lastDeletedId = null;
-    let undoTimeout = null;
     let hiddenBillingIds = JSON.parse(localStorage.getItem('hiddenBillingIds')) || [];
 
     // --- MODAL SYSTEM ---
@@ -256,12 +278,10 @@
         const body = document.getElementById('modalBody');
         const subtext = document.getElementById('modalSubtext');
         const buttons = document.getElementById('modalButtons');
-
         header.className = `p-4 text-center ${config.headerClass}`;
         title.innerText = config.title;
         body.innerHTML = config.body;
         subtext.innerText = config.subtext;
-        
         buttons.innerHTML = '';
         config.buttons.forEach(btn => {
             const b = document.createElement('button');
@@ -270,97 +290,27 @@
             b.onclick = () => { btn.action(); closeModal(); };
             buttons.appendChild(b);
         });
-
         modal.style.display = 'flex';
     }
 
-    function closeModal() {
-        document.getElementById('customModal').style.display = 'none';
-    }
+    function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
-    // --- INTEGRATED WA LOGIC ---
-    async function prosesWa(hp, id, nama, japo, paket, source = 'general') {
-        const cardEl = document.getElementById(`card-${id}`);
-        const email = cardEl ? cardEl.getAttribute('data-email') || '-' : '-';
-        const alamat = cardEl ? cardEl.querySelector('p:nth-child(5) b').innerText : '-';
-        const tgl = cardEl ? cardEl.querySelector('p:nth-child(2) b').innerText : '-';
-
-        openModal({
-            title: '📲 OPSI PENGIRIMAN WA',
-            headerClass: 'bg-green-600',
-            body: `<p class="text-xs">Pilih metode pengiriman untuk:</p><p class="text-lg font-black">${nama}</p>`,
-            subtext: 'ID: ' + id,
-            buttons: [
-                { 
-                    text: 'KIRIM TANPA TEKS', 
-                    class: 'bg-slate-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md', 
-                    action: () => executeWaAction(hp, id, nama, japo, paket, alamat, tgl, email, false, source) 
-                },
-                { 
-                    text: 'KIRIM TEKS OTOMATIS', 
-                    class: 'bg-green-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md', 
-                    action: () => executeWaAction(hp, id, nama, japo, paket, alamat, tgl, email, true, source) 
-                }
-            ]
-        });
-    }
-
-    async function executeWaAction(hp, id, nama, japo, paket, alamat, tgl, email, withText, source) {
-        try {
-            let text = "";
-            if (withText) {
-                const tglParts = tgl.split('/'); 
-                const hariPasang = parseInt(tglParts[0]); 
-                const today = new Date();
-                const hariSekarang = today.getDate(); 
-                
-                let diffDays = (hariSekarang >= hariPasang) ? (hariSekarang - hariPasang) : ((hariSekarang + 30) - hariPasang);
-                const hours = today.getHours();
-                let salam = (hours >= 5 && hours < 11) ? "Pagi" : (hours >= 11 && hours < 15) ? "Siang" : (hours >= 15 && hours < 18) ? "Sore" : "Malam";
-
-                if (diffDays <= 2) {
-                    text = `Selamat ${salam} Pelanggan yth. *${nama.trim()}*,%0A%0A*PENGINGAT TAGIHAN MyRepublic*%0A%0ASemoga sehat selalu. Kami menginformasikan rincian layanan internet Anda:%0A%0A🆔 ID Pelanggan: *${id}*%0A🚀 Paket: *${paket}*%0A🔔 Jatuh Tempo: *Setiap Tanggal ${japo}*%0A%0A_Mohon lakukan pembayaran tepat waktu untuk menghindari denda keterlambatan dan isolir layanan._%0A%0A*Penting:*%0A• Silakan *abaikan pesan ini apabila Anda sudah melakukan pembayaran.*%0A%0ATerima kasih.`;
-                } else if (diffDays >= 3 && diffDays <= 5) {
-                    text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Mengingatkan tagihan dengan ID Pelanggan *${id}* sudah dapat dilakukan pembayaran agar layanan tetap aktif. Terima kasih.`;
-                } else if (diffDays >= 6 && diffDays <= 10) {
-                    text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saat ini tagihan ID Pelanggan *${id}* sudah melewati jatuh tempo.%0A%0ASegera lakukan Pembayaran hari ini untuk menghindari internet terisolir otomatis oleh sistem. Terima kasih.`;
-                } else {
-                    text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Saya ingin follow-up mengenai kualitas jaringan MyRepublic<br>apakah selama ini ada kendala.</br>Mohon diinfokan apabila ada trouble agar segera dibantu oleh Tim kami.<br>Terima kasih.</br>`;
-                }
-                await downloadImage(nama, id, paket, alamat, tgl, japo, hp, email);
-            }
-
-            let cleanHp = hp.replace(/\D/g, "");
-            if (cleanHp.startsWith("0")) cleanHp = "62" + cleanHp.slice(1);
-            const waAppUrl = `whatsapp://send?phone=${cleanHp}&text=${text}`;
-            const waWebUrl = `https://api.whatsapp.com/send?phone=${cleanHp}&text=${text}`;
-            window.location.href = waAppUrl;
-            setTimeout(() => { if (document.hasFocus()) { window.open(waWebUrl, '_blank'); } }, 500);
-
-            if (source === 'progress') {
-                await new Promise(resolve => setTimeout(resolve, 5000));
-                fetch(`${scriptURL}?action=hapusHanyaTextProgress&idCst=${id}`); 
-                updateProgressCounter();
-            }
-        } catch(e) { console.error("Error pada proses WA:", e); }
-    }
-
+    // --- SEARCH & RENDER CARDS ---
     function renderCard(item, mode) {
-        if (mode === 'fast' && hiddenBillingIds.includes(item.idCst)) { return ""; }
+        if (mode === 'fast' && hiddenBillingIds.includes(item.idCst)) return "";
         
-        const tglParts = item.tanggal.split('/');
-        const pasangDate = new Date(tglParts[2], tglParts[1] - 1, tglParts[0]);
-        const today = new Date();
-        const diffDays = Math.ceil(Math.abs(today - pasangDate) / (1000 * 60 * 60 * 24));
+        const parts = item.tanggal.includes('/') ? item.tanggal.split('/') : item.tanggal.split('-');
+        const pasangDate = new Date(parts[2], parts[1]-1, parts[0]);
+        const diffDays = Math.ceil(Math.abs(new Date() - pasangDate) / (1000 * 60 * 60 * 24));
         
-        let cardColorClass = (diffDays <= 10) ? "card-red border-red-200" : (diffDays <= 60 ? "card-orange border-orange-200" : "card-blue border-blue-200");
+        let cardColor = (diffDays <= 10) ? "card-red border-red-200" : (diffDays <= 60 ? "card-orange border-orange-200" : "card-blue border-blue-200");
         let statusLabel = (diffDays <= 10) ? `<span class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">${diffDays} HARI</span>` : (diffDays <= 60 ? '<span class="bg-orange-500 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">BARU</span>' : '<span class="bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-black ml-2">LAMA</span>');
-        const isProg = item.command.toLowerCase().includes('progress');
-        const commandHtml = item.command && item.command.trim() !== "" ? `<p class="col-span-2 border-t pt-1 mt-1 text-indigo-700 font-semibold">📝 Command: <i>${item.command}</i></p>` : "";
+        
         const billingBtn = (mode === 'fast') ? `<button onclick="handleBillingClick('${item.idCst}')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[10px] shadow-sm">Billing</button>` : "";
+        const commandHtml = item.command && item.command.trim() !== "" ? `<p class="col-span-2 border-t pt-1 mt-1 text-indigo-700 font-semibold">📝 Command: <i>${item.command}</i></p>` : "";
 
         return `
-            <div id="card-${item.idCst}" data-email="${item.email || '-'}" class="glass-card p-5 shadow-xl border-l-[12px] mb-4 ${cardColorClass} ${isProg ? 'border-orange-500' : ''}">
+            <div id="card-${item.idCst}" data-email="${item.email || '-'}" class="glass-card p-5 shadow-xl border-l-[12px] mb-4 ${cardColor}">
                 <div class="mb-3">
                     <h3 class="font-black text-indigo-900 uppercase text-lg leading-tight blink-name">${item.nama}</h3>
                     <div class="flex gap-2 mt-2">
@@ -370,8 +320,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-slate-600 bg-white/50 p-3 rounded-xl mb-3 border border-slate-200">
                     <p class="col-span-2 flex items-center bg-white p-1.5 rounded border border-indigo-100 mb-1">
-                        <span>🆔 ID: <b class="text-indigo-900">${item.idCst}</b></span>
-                        ${statusLabel} 
+                        <span>🆔 ID: <b class="text-indigo-900">${item.idCst}</b></span>${statusLabel}
                     </p>
                     <p>🗓️ Pasang: <b>${item.tanggal}</b></p>
                     <p>🔔 JAPO: <b class="text-red-500">Tgl ${item.japo}</b></p>
@@ -379,190 +328,8 @@
                     <p class="col-span-2">📍 Alamat: <b>${item.alamat}</b></p>
                     ${commandHtml}
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="prosesWa('${item.hp}', '${item.idCst}', '${item.nama}', '${item.japo}', '${item.paket}', '${mode}')" class="flex-1 bg-green-500 text-white font-black py-3 rounded-xl text-xs hover:bg-green-600 shadow-lg transition-all active:scale-95">KIRIM NOTIFIKASI WA</button>
-                </div>
+                <button onclick="prosesWa('${item.hp}', '${item.idCst}', '${item.nama}', '${item.japo}', '${item.paket}', '${mode}')" class="w-full bg-green-500 text-white font-black py-3 rounded-xl text-xs hover:bg-green-600 shadow-lg transition-all active:scale-95">KIRIM NOTIFIKASI WA</button>
             </div>`;
-    }
-
-    function handleBillingClick(idCst) {
-        const card = document.getElementById(`card-${idCst}`);
-        const nama = card.querySelector('h3').innerText;
-        const alamat = card.querySelector('p:nth-child(5) b').innerText;
-        openModal({
-            title: '⚠️ VERIFIKASI PEMBAYARAN',
-            headerClass: 'bg-red-600',
-            body: `<p>${nama}</p><p>${idCst}</p><p class="text-[10px] normal-case opacity-70">${alamat}</p>`,
-            subtext: 'APAKAH PELANGGAN SUDAH BAYAR?',
-            buttons: [
-                { text: 'BATAL', class: 'bg-slate-100 text-slate-500 py-3 rounded-xl font-black text-xs uppercase', action: () => {} },
-                { text: 'YA, SUDAH', class: 'bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg', action: () => executeBilling(idCst) }
-            ]
-        });
-    }
-
-    function handleCopyClick(idCst) {
-        const card = document.getElementById(`card-${idCst}`);
-        const nama = card.querySelector('h3').innerText;
-        const alamat = card.querySelector('p:nth-child(5) b').innerText;
-        openModal({
-            title: '📋 SALIN ID PELANGGAN',
-            headerClass: 'bg-indigo-600',
-            body: `<p>${nama}</p><p class="text-indigo-600 text-xl font-black">${idCst}</p><p class="text-[10px] normal-case opacity-70">${alamat}</p>`,
-            subtext: 'ID AKAN DISALIN KE PAPAN KLIP',
-            buttons: [
-                { text: 'BATAL', class: 'bg-slate-100 text-slate-500 py-3 rounded-xl font-black text-xs uppercase', action: () => {} },
-                { text: 'SALIN SEKARANG', class: 'bg-indigo-600 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg', action: () => copyText(idCst) }
-            ]
-        });
-    }
-
-    function executeBilling(idCst) {
-        const card = document.getElementById(`card-${idCst}`);
-        if (card) {
-            card.style.display = 'none';
-            lastDeletedId = idCst;
-            if (!hiddenBillingIds.includes(idCst)) {
-                hiddenBillingIds.push(idCst);
-                localStorage.setItem('hiddenBillingIds', JSON.stringify(hiddenBillingIds));
-                const totalFastEl = document.getElementById('totalFastCount');
-                let currentCount = parseInt(totalFastEl.innerText) || 0;
-                if(currentCount > 0) totalFastEl.innerText = currentCount - 1;
-            }
-            const toast = document.getElementById('undoToast');
-            toast.style.display = 'flex';
-            if(undoTimeout) clearTimeout(undoTimeout);
-            undoTimeout = setTimeout(() => { toast.style.display = 'none'; }, 5000); 
-        }
-    }
-
-    function resetBillingFilter() {
-        openModal({
-            title: '🔄 RESET FILTER LIST',
-            headerClass: 'bg-slate-800',
-            body: `<p>ANDA AKAN MEMUNCULKAN KEMBALI SEMUA DATA YANG TERSEMBUNYI</p>`,
-            subtext: 'LANJUTKAN PROSES INI?',
-            buttons: [
-                { text: 'BATAL', class: 'bg-slate-100 text-slate-500 py-3 rounded-xl font-black text-xs uppercase', action: () => {} },
-                { text: 'YA, RESET', class: 'bg-slate-800 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg', action: () => {
-                    hiddenBillingIds = [];
-                    localStorage.setItem('hiddenBillingIds', JSON.stringify([]));
-                    cariData('fast'); 
-                }}
-            ]
-        });
-    }
-
-    function undoBilling() {
-        if (lastDeletedId) {
-            const card = document.getElementById(`card-${lastDeletedId}`);
-            if (card) {
-                card.style.display = 'block';
-                hiddenBillingIds = hiddenBillingIds.filter(id => id !== lastDeletedId);
-                localStorage.setItem('hiddenBillingIds', JSON.stringify(hiddenBillingIds));
-                const totalFastEl = document.getElementById('totalFastCount');
-                let currentCount = parseInt(totalFastEl.innerText) || 0;
-                totalFastEl.innerText = currentCount + 1;
-                document.getElementById('undoToast').style.display = 'none';
-                lastDeletedId = null;
-            }
-        }
-    }
-
-    function copyText(text) {
-        navigator.clipboard.writeText(text).then(() => {}).catch(err => {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-        });
-    }
-
-    function updateBulanDisplay() {
-        const bulanNames = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
-        const d = new Date();
-        document.getElementById('displayBulan').innerText = "BULAN " + bulanNames[d.getMonth()];
-    }
-
-    function triggerAnimate(el) {
-        if(!el) return;
-        el.classList.remove('animate-click');
-        void el.offsetWidth; 
-        el.classList.add('animate-click');
-    }
-
-    function formatPhoneNumber(phone) {
-        let clean = phone.replace(/\D/g, "");
-        if (clean.startsWith("62")) { clean = clean.slice(2); } 
-        else if (clean.startsWith("0")) { clean = clean.slice(1); }
-        return "wa.me/+62" + clean;
-    }
-
-    // --- SECURITY PIN ---
-    let currentPin = "";
-    function pressPin(num) { if (currentPin.length < 4) { currentPin += num; document.getElementById('pinInput').value = currentPin; } }
-    function clearPin() { currentPin = ""; document.getElementById('pinInput').value = ""; }
-    
-    async function checkPin() {
-        if (currentPin.length < 4) return;
-        const btn = document.getElementById('btnEnter');
-        btn.innerHTML = "⏳";
-        try {
-            const res = await fetch(`${scriptURL}?action=validatePin&pin=${currentPin}`);
-            const result = await res.json();
-            if (result.status === "authorized") {
-                document.getElementById('lockScreen').classList.add('hidden');
-                sessionStorage.setItem('isLoggedIn', 'true');
-                document.getElementById('resultsList').innerHTML = ""; 
-                sessionStorage.removeItem('last_search_html'); 
-                updateProgressCounter(); 
-                cariData('silent_update'); 
-            } else { 
-                openModal({
-                    title: '❌ PIN SALAH',
-                    headerClass: 'bg-red-600',
-                    body: `<p>PIN YANG ANDA MASUKKAN TIDAK SESUAI</p>`,
-                    subtext: 'SILAKAN COBA LAGI',
-                    buttons: [{ text: 'OK', class: 'bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', action: () => clearPin() }]
-                });
-            }
-        } catch (e) { alert("Error koneksi!"); clearPin(); }
-        finally { btn.innerHTML = "OK"; }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        updateBulanDisplay();
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-            document.getElementById('lockScreen').classList.add('hidden');
-            updateProgressCounter();
-            cariData('silent_update');
-        }
-        
-        const selectPaket = document.getElementById('selectPaket');
-        for (let i = 10; i <= 1000; i += (i < 100 ? 10 : 50)) {
-            let label = i >= 1000 ? "1Gbps" : i + "Mbps";
-            selectPaket.add(new Option(label, label));
-        }
-
-        const selectBonus = document.getElementById('selectBonus');
-        selectBonus.innerHTML = ""; 
-        selectBonus.add(new Option("-- Pilih Bonus --", ""));
-        for (let b = 25000; b <= 1000000; b += 25000) {
-            let label = "Rp" + b.toLocaleString('id-ID');
-            selectBonus.add(new Option(label, label));
-        }
-        muatDataTabel(); 
-    });
-
-    function switchTab(tab) {
-        ['sectionInput', 'sectionCari', 'sectionTabel'].forEach(id => document.getElementById(id).classList.add('hidden'));
-        ['tabInput', 'tabCari', 'tabTabel'].forEach(id => document.getElementById(id).classList.remove('tab-active'));
-        document.getElementById('section' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
-        document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('tab-active');
-        if(tab === 'cari') { updateProgressCounter(); }
-        if(tab === 'tabel') { updateBulanDisplay(); muatDataTabel(); }
     }
 
     async function cariData(mode, btnEl) {
@@ -571,159 +338,265 @@
         const tglFilter = document.getElementById('dateInput').value;
         const list = document.getElementById('resultsList');
         
-        if (mode === 'search') {
-            if (!query && !tglFilter) { 
-                openModal({ title: '⚠️ INPUT KOSONG', headerClass: 'bg-orange-500', body: `<p>NAMA, ID CST, ATAU TANGGAL BELUM DIISI</p>`, subtext: 'SILAKAN MASUKKAN KATA KUNCI PENCARIAN', buttons: [{ text: 'MENGERTI', class: 'bg-orange-500 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', action: () => {} }] });
-                return; 
-            }
-        }
-        
-        if (mode !== 'silent_update') { list.innerHTML = "<p class='text-white text-center animate-pulse'>🔍 Mencari Data...</p>"; }
+        updateProgressCounter();
+
+        if (mode === 'search' && !query && !tglFilter) return;
+        if (mode !== 'silent_update') list.innerHTML = "<p class='text-white text-center animate-pulse'>🔍 Mencari Data...</p>";
 
         try {
             const res = await fetch(`${scriptURL}?id=${encodeURIComponent((mode === 'progress' || mode === 'fast' || mode === 'silent_update') ? '' : query)}`);
             const json = await res.json();
-            let items = json.data;
-
-            // --- FILTER: Hapus data yang mengandung kata "OFF" (Case Insensitive) pada ID atau Command ---
-            items = items.filter(i => {
-                const idCstStr = String(i.idCst).toLowerCase();
-                const commandStr = String(i.command || "").toLowerCase();
-                return !idCstStr.includes('off') && !commandStr.includes('off');
-            });
+            let items = (json.data || []).filter(i => !String(i.idCst).toLowerCase().includes('off') && !String(i.command || "").toLowerCase().includes('off'));
             
             let allFastItems = items.filter(i => {
-                const parts = i.tanggal.includes('/') ? i.tanggal.split('/') : i.tanggal.split('-');
-                const d = new Date(parts[2], parts[1]-1, parts[0]);
-                const diff = Math.ceil(Math.abs(new Date() - d) / (1000 * 60 * 60 * 24));
-                return diff <= 10;
+                const p = i.tanggal.includes('/') ? i.tanggal.split('/') : i.tanggal.split('-');
+                const d = new Date(p[2], p[1]-1, p[0]);
+                return Math.ceil(Math.abs(new Date() - d) / (1000 * 60 * 60 * 24)) <= 10;
             });
-            let visibleFastItems = allFastItems.filter(i => !hiddenBillingIds.includes(i.idCst));
-            document.getElementById('totalFastCount').innerText = visibleFastItems.length;
+            document.getElementById('totalFastCount').innerText = allFastItems.filter(i => !hiddenBillingIds.includes(i.idCst)).length;
 
-            if (mode === 'silent_update') return; 
-
+            if (mode === 'silent_update') return;
             if (mode === 'progress') items = items.filter(i => i.command.toLowerCase().includes('progress'));
             if (mode === 'fast') items = allFastItems;
+            if (tglFilter) items = items.filter(i => (i.tanggal.includes('/') ? i.tanggal.split('/')[0] : i.tanggal.split('-')[2]) == parseInt(tglFilter));
+
+            if (!items.length) { list.innerHTML = "<p class='text-white text-center font-bold bg-white/10 p-4 rounded-xl'>Data tidak ditemukan.</p>"; return; }
             
-            if (tglFilter) items = items.filter(i => {
-                let day = i.tanggal.includes('/') ? i.tanggal.split('/')[0] : i.tanggal.split('-')[2];
-                return parseInt(day) == parseInt(tglFilter);
-            });
-
-            if (!items.length) { 
-                list.innerHTML = "<p class='text-white text-center font-bold bg-white/10 p-4 rounded-xl'>Nol Data Ditemukan.</p>"; 
-                return; 
-            }
-
-            list.innerHTML = "";
-            let htmlContent = "";
+            let html = "";
             if (mode === 'fast') {
-                const group5 = items.filter(i => {
-                    const parts = i.tanggal.includes('/') ? i.tanggal.split('/') : i.tanggal.split('-');
-                    const d = new Date(parts[2], parts[1]-1, parts[0]);
-                    return Math.ceil(Math.abs(new Date() - d) / (1000 * 60 * 60 * 24)) <= 5;
-                });
-                const group10 = items.filter(i => {
-                    const parts = i.tanggal.includes('/') ? i.tanggal.split('/') : i.tanggal.split('-');
-                    const d = new Date(parts[2], parts[1]-1, parts[0]);
-                    const diff = Math.ceil(Math.abs(new Date() - d) / (1000 * 60 * 60 * 24));
-                    return diff > 5 && diff <= 10;
-                });
-                if (group10.length > 0) {
-                    htmlContent += `<div class="group-header">⚠️ KATEGORI 6 - 10 HARI (TAGIHAN DEKAT)</div>`;
-                    group10.forEach(item => htmlContent += renderCard(item, mode));
-                }
-                if (group5.length > 0) {
-                    htmlContent += `<div class="group-header">✅ KATEGORI 1 - 5 HARI (BARU PASANG)</div>`;
-                    group5.forEach(item => htmlContent += renderCard(item, mode));
-                }
+                const g10 = items.filter(i => { const p = i.tanggal.includes('/')?i.tanggal.split('/'):i.tanggal.split('-'); const diff = Math.ceil(Math.abs(new Date() - new Date(p[2], p[1]-1, p[0]))/(1000*60*60*24)); return diff > 5; });
+                const g5 = items.filter(i => { const p = i.tanggal.includes('/')?i.tanggal.split('/'):i.tanggal.split('-'); const diff = Math.ceil(Math.abs(new Date() - new Date(p[2], p[1]-1, p[0]))/(1000*60*60*24)); return diff <= 5; });
+                if(g10.length) html += `<div class="group-header">⚠️ TAGIHAN DEKAT (6-10 HARI)</div>` + g10.map(i => renderCard(i, mode)).join('');
+                if(g5.length) html += `<div class="group-header">✅ BARU PASANG (1-5 HARI)</div>` + g5.map(i => renderCard(i, mode)).join('');
             } else {
-                items.forEach(item => { htmlContent += renderCard(item, mode); });
+                items.forEach(i => html += renderCard(i, mode));
             }
-            list.innerHTML = htmlContent;
-        } catch (e) { 
-            if(mode !== 'silent_update') list.innerHTML = "<p class='text-white text-center'>Gagal memuat data.</p>"; 
-        }
+            list.innerHTML = html;
+        } catch (e) { list.innerHTML = "<p class='text-white text-center'>Gagal memuat.</p>"; }
     }
 
+    // --- WA LOGIC ---
+    async function prosesWa(hp, id, nama, japo, paket, source = 'general') {
+        const cardEl = document.getElementById(`card-${id}`);
+        const email = cardEl ? cardEl.getAttribute('data-email') || '-' : '-';
+        const alamat = cardEl ? cardEl.querySelector('p:nth-child(5) b').innerText : '-';
+        const tgl = cardEl ? cardEl.querySelector('p:nth-child(2) b').innerText : '-';
+
+        openModal({
+            title: '📲 OPSI PENGIRIMAN WA',
+            headerClass: 'bg-green-600',
+            body: `<p class="text-xs">Pilih metode untuk:</p><p class="text-lg font-black">${nama}</p>`,
+            subtext: 'ID: ' + id,
+            buttons: [
+                { text: 'TANPA TEKS', class: 'bg-slate-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md', action: () => executeWaAction(hp, id, nama, japo, paket, alamat, tgl, email, false, source) },
+                { text: 'TEKS OTOMATIS', class: 'bg-green-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md', action: () => executeWaAction(hp, id, nama, japo, paket, alamat, tgl, email, true, source) }
+            ]
+        });
+    }
+
+    async function executeWaAction(hp, id, nama, japo, paket, alamat, tgl, email, withText, source) {
+        try {
+            let text = "";
+            if (withText) {
+                const parts = tgl.split('/'); const hariPasang = parseInt(parts[0]);
+                const today = new Date(); const hariSekarang = today.getDate();
+                let diff = (hariSekarang >= hariPasang) ? (hariSekarang - hariPasang) : ((hariSekarang + 30) - hariPasang);
+                let salam = (today.getHours() < 11) ? "Pagi" : (today.getHours() < 15) ? "Siang" : (today.getHours() < 18) ? "Sore" : "Malam";
+
+                if (diff <= 2) {
+                    text = `Selamat ${salam} *${nama.trim()}*,%0A%0A*PENGINGAT TAGIHAN*%0A🆔 ID: *${id}*%0A🚀 Paket: *${paket}*%0A🔔 JAPO: *Tgl ${japo}*%0A%0AMohon lakukan pembayaran tepat waktu. Terima kasih.`;
+                } else if (diff <= 5) {
+                    text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Mengingatkan tagihan ID *${id}* sudah dapat dibayar. Terima kasih.`;
+                } else {
+                    text = `Selamat ${salam} Bpk/Ibu *${nama.trim()}*. Tagihan ID *${id}* sudah melewati jatuh tempo. Segera bayar untuk menghindari isolir.`;
+                }
+                await downloadImage(nama, id, paket, alamat, tgl, japo, hp, email);
+            }
+            let cleanHp = hp.replace(/\D/g, "");
+            if (cleanHp.startsWith("0")) cleanHp = "62" + cleanHp.slice(1);
+            window.location.href = `whatsapp://send?phone=${cleanHp}&text=${text}`;
+            if (source === 'progress') {
+                setTimeout(() => fetch(`${scriptURL}?action=hapusHanyaTextProgress&idCst=${id}`).then(() => updateProgressCounter()), 3000);
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    // --- REKAPITULASI LOGIC (AKTUALISASI DATA BONUS) ---
     async function muatDataTabel(btnEl) {
         if(btnEl) triggerAnimate(btnEl); 
         const btn = document.getElementById('btnRefreshTabel');
-        const originalText = btn.innerText;
-        btn.innerText = "⏳ MENCARI DATA...";
+        btn.innerText = "⏳ MENCARI...";
         try {
-            const res = await fetch(`${scriptURL}?action=getTableSummary`);
-            const d = await res.json();
-            localStorage.setItem('myrep_rekap_cache', JSON.stringify(d));
-            renderRekapUI(d);
-        } catch (e) { console.error(e); }
-        finally { btn.innerText = originalText; }
+            // Apps script harus menangani range K8:K67 untuk totalBonus
+            const resSum = await fetch(`${scriptURL}?action=getTableSummary`);
+            const summary = await resSum.json();
+            
+            const resFull = await fetch(`${scriptURL}`);
+            const fullJson = await resFull.json();
+            const now = new Date();
+            let lm = now.getMonth() - 1; let ty = now.getFullYear();
+            if(lm < 0) { lm = 11; ty--; }
+
+            const bn = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
+            document.getElementById('displayBulan').innerText = "BULAN " + bn[now.getMonth()];
+            document.getElementById('label-kurang').innerText = "SA " + bn[lm];
+
+            let countLM = 0;
+            if(fullJson.data) {
+                fullJson.data.forEach(item => {
+                    if(item.tanggal) {
+                        const sep = item.tanggal.includes('/') ? '/' : '-';
+                        const p = item.tanggal.split(sep);
+                        let m = (sep === '/') ? parseInt(p[1])-1 : parseInt(p[1])-1;
+                        let y = (sep === '/') ? parseInt(p[2]) : parseInt(p[0]);
+                        if(m === lm && y === ty) countLM++;
+                    }
+                });
+            }
+            summary.pointKurang = countLM; 
+            renderRekapUI(summary);
+            updateProgressCounter();
+        } catch (e) { console.error(e); } finally { btn.innerText = "🔄 Sinkronisasi Data Aktif"; }
     }
 
     function renderRekapUI(d) {
-        document.getElementById('t-sa').innerText = d.totalSA || 0;
+        const sa = parseInt(d.totalSA) || 0;
+        const bulanLalu = parseInt(d.pointKurang) || 0;
+        const saKurang = bulanLalu - sa;
+        document.getElementById('t-sa').innerText = sa;
         document.getElementById('t-off').innerText = d.totalOff || 0;
         document.getElementById('t-aktif').innerText = d.pelangganAktif || 0;
         document.getElementById('t-baru').innerText = d.totalIdBaru || 0;
-        document.getElementById('t-point').innerText = d.totalPoint || 0;
-        document.getElementById('t-kurang').innerText = d.pointKurang || 0;
+        document.getElementById('t-point').innerText = saKurang;
+        document.getElementById('t-kurang').innerText = bulanLalu; 
+        
+        // Menampilkan Total Bonus yang ditarik dari kolom K8:K67
         document.getElementById('t-bonus').innerText = d.totalBonus || 'Rp0';
+        
+        let nilaiAchievement = bulanLalu - saKurang;
+        let percent = 0;
+        if (bulanLalu > 0) percent = (nilaiAchievement / bulanLalu) * 100;
+        const displayPercent = Math.max(0, Math.round(percent));
+        document.getElementById('targetProgressBar').style.width = Math.min(displayPercent, 100) + '%';
+        document.getElementById('targetPercentText').innerText = displayPercent + '%';
+        const barFill = document.getElementById('targetProgressBar');
+        barFill.style.backgroundColor = displayPercent >= 100 ? '#10b981' : '#6366f1';
     }
 
-    async function updateProgressCounter() {
+    // --- UTILITIES ---
+    function handleBillingClick(id) {
+        openModal({
+            title: '⚠️ VERIFIKASI', headerClass: 'bg-red-600', body: `<p>ID: ${id}</p>`, subtext: 'PELANGGAN SUDAH BAYAR?',
+            buttons: [
+                { text: 'BATAL', class: 'bg-slate-100 py-3 rounded-xl font-black text-xs', action: () => {} },
+                { text: 'YA, SUDAH', class: 'bg-red-600 text-white py-3 rounded-xl font-black text-xs', action: () => executeBilling(id) }
+            ]
+        });
+    }
+
+    function executeBilling(id) {
+        document.getElementById(`card-${id}`).style.display = 'none';
+        lastDeletedId = id;
+        if(!hiddenBillingIds.includes(id)) {
+            hiddenBillingIds.push(id);
+            localStorage.setItem('hiddenBillingIds', JSON.stringify(hiddenBillingIds));
+        }
+        document.getElementById('undoToast').style.display = 'flex';
+        setTimeout(() => document.getElementById('undoToast').style.display = 'none', 5000);
+    }
+
+    function undoBilling() {
+        if(lastDeletedId) {
+            const el = document.getElementById(`card-${lastDeletedId}`);
+            if(el) el.style.display = 'block';
+            hiddenBillingIds = hiddenBillingIds.filter(i => i !== lastDeletedId);
+            localStorage.setItem('hiddenBillingIds', JSON.stringify(hiddenBillingIds));
+            document.getElementById('undoToast').style.display = 'none';
+        }
+    }
+
+    function resetBillingFilter() {
+        hiddenBillingIds = [];
+        localStorage.setItem('hiddenBillingIds', JSON.stringify([]));
+        cariData('fast');
+    }
+
+    function handleCopyClick(id) {
+        navigator.clipboard.writeText(id);
+        openModal({ title: '📋 SALIN ID', headerClass: 'bg-indigo-600', body: `<p class="text-2xl font-black">${id}</p>`, subtext: 'ID BERHASIL DISALIN', buttons: [{ text: 'OK', class: 'bg-indigo-600 text-white py-3 rounded-xl font-black text-xs w-full col-span-2', action: () => {} }] });
+    }
+
+    async function updateProgressCounter() { try { const r = await fetch(`${scriptURL}?action=countProgress`); const text = await r.text(); document.getElementById('totalProgressCount').innerText = text; } catch(e){ console.log("Counter error", e); } }
+    function triggerAnimate(el) { el.classList.remove('animate-click'); void el.offsetWidth; el.classList.add('animate-click'); }
+    function pressPin(n) { let p = document.getElementById('pinInput'); if(p.value.length < 4) p.value += n; }
+    function clearPin() { document.getElementById('pinInput').value = ""; }
+    
+    async function checkPin() {
+        let pin = document.getElementById('pinInput').value;
+        if(pin.length < 4) return;
+        const btn = document.getElementById('btnEnter');
+        btn.innerHTML = "⏳";
         try {
-            const res = await fetch(`${scriptURL}?action=countProgress`);
-            document.getElementById('totalProgressCount').innerText = await res.text();
-        } catch(e) {}
+            const r = await fetch(`${scriptURL}?action=validatePin&pin=${pin}`);
+            const res = await r.json();
+            if(res.status === "authorized") {
+                document.getElementById('lockScreen').classList.add('hidden');
+                sessionStorage.setItem('isLoggedIn', 'true');
+                muatDataTabel(); 
+                updateProgressCounter();
+            } else { alert("PIN SALAH"); clearPin(); }
+        } catch(e) { alert("Error"); } finally { btn.innerHTML = "OK"; }
+    }
+
+    async function downloadImage(nama, id, paket, alamat, tgl, japo, hp, email) {
+        document.getElementById('c-nama').innerText = nama;
+        document.getElementById('c-id-bayar').innerText = id;
+        document.getElementById('c-paket').innerText = paket;
+        document.getElementById('c-hp').innerText = hp;
+        document.getElementById('c-email').innerText = email;
+        document.getElementById('c-alamat').innerText = alamat;
+        document.getElementById('c-tgl').innerText = tgl;
+        document.getElementById('c-japo').innerText = japo;
+        const canvas = await html2canvas(document.getElementById('canvasTemplate'), { scale: 2, useCORS: true });
+        const link = document.createElement('a');
+        link.download = `Kartu_${nama}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+
+    function switchTab(t) {
+        ['sectionInput', 'sectionCari', 'sectionTabel'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        ['tabInput', 'tabCari', 'tabTabel'].forEach(id => document.getElementById(id).classList.remove('tab-active'));
+        document.getElementById('section' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('hidden');
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('tab-active');
+        if(t === 'tabel') muatDataTabel();
+        if(t === 'cari') updateProgressCounter();
     }
 
     document.getElementById('rekapanForm').addEventListener('submit', async e => {
         e.preventDefault();
         const btn = document.getElementById('btnKirim');
-        triggerAnimate(btn);
-        btn.disabled = true; btn.innerHTML = "🚀 MENYIMPAN...";
-        const formData = new FormData(e.target);
-        const hpValue = formData.get('hp');
-        if (hpValue) formData.set('hp', formatPhoneNumber(hpValue));
+        btn.disabled = true; btn.innerText = "🚀 MENYIMPAN...";
         try {
-            const response = await fetch(scriptURL, { method: 'POST', body: formData });
-            const result = await response.text();
-            if(result === "Success") {
-                openModal({ title: '✅ BERHASIL', headerClass: 'bg-green-600', body: `<p>DATA PELANGGAN TELAH TERSIMPAN</p>`, subtext: 'DATABASE TELAH DIPERBARUI', buttons: [{ text: 'OK', class: 'bg-green-600 text-white py-3 rounded-xl font-black text-xs uppercase w-full col-span-2', action: () => {} }] });
-                e.target.reset();
-                updateProgressCounter(); muatDataTabel(); 
-            }
-        } catch (err) { alert("Masalah Koneksi!"); }
-        finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
+            const r = await fetch(scriptURL, { method: 'POST', body: new FormData(e.target) });
+            if(await r.text() === "Success") { alert("Berhasil!"); e.target.reset(); muatDataTabel(); }
+        } catch(e) { alert("Error"); } finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
     });
 
-    async function downloadImage(nama, id, paket, alamat, tgl, japo, hp, email) {
-        const formatHP = (num) => {
-            if (!num) return '-';
-            let cleaned = ('' + num).replace(/\D/g, ''); 
-            if (cleaned.startsWith('62')) { cleaned = '0' + cleaned.substring(2); }
-            if (!cleaned.startsWith('0') && cleaned.length > 0) { cleaned = '0' + cleaned; }
-            let match = cleaned.match(/^(\d{4})(\d{4})(\d{2,5})$/);
-            return match ? `${match[1]}-${match[2]}-${match[3]}` : cleaned;
-        };
-        document.getElementById('c-nama').innerText = nama || '-';
-        document.getElementById('c-id-bayar').innerText = id || '-';
-        document.getElementById('c-paket').innerText = paket || '-';
-        document.getElementById('c-hp').innerText = formatHP(hp);
-        document.getElementById('c-email').innerText = email || '-';
-        document.getElementById('c-alamat').innerText = alamat || '-';
-        document.getElementById('c-tgl').innerText = tgl || '-';
-        document.getElementById('c-japo').innerText = japo || '-';
-        try {
-            const element = document.getElementById('canvasTemplate');
-            const canvas = await html2canvas(element, { scale: 3, useCORS: true, logging: false, backgroundColor: null });
-            const link = document.createElement('a');
-            link.download = `Kartu_${(nama || 'Pelanggan').replace(/\s+/g, '_')}.png`;
-            link.href = canvas.toDataURL("image/png");
-            link.click();
-        } catch (error) { console.error("Error download:", error); }
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+        const bn = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
+        const now = new Date();
+        document.getElementById('displayBulan').innerText = "BULAN " + bn[now.getMonth()];
+        let lmIndex = now.getMonth() - 1;
+        if(lmIndex < 0) lmIndex = 11;
+        document.getElementById('label-kurang').innerText = "SA " + bn[lmIndex];
+        
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            document.getElementById('lockScreen').classList.add('hidden');
+            muatDataTabel();
+            updateProgressCounter();
+        }
+    });
 </script>
 </body>
 </html>
